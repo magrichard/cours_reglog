@@ -1,0 +1,114 @@
+---
+title: "Regression logistique"
+subtitle: "Séance 1"
+author: "Florent Chuffart & Magali Richard"
+date: "13 Novembre 2018"
+output:
+  xaringan::moon_reader:
+    self_contained: false
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+#options(htmltools.dir.version = FALSE, width = 75)
+knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.width = "100%")
+```
+
+class: inverse, center, middle
+
+# Introduction
+## RStudio
+## Integration of Git
+
+---
+
+class: inverse, center, middle
+
+# Introduction to Git
+
+---
+
+```{r}
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+DT::datatable(d, width = "100%")
+#head(d)
+```
+
+---
+
+## What is Git
+
+Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
+
+- A versionning system (Git)
+
+- A collaborative system (publish and share your code on a platform)
+
+[Git website](https://git-scm.com/)
+
+[Install git](https://git-scm.com/downloads)
+
+[Git introducing video](https://git-scm.com/video/what-is-version-control)
+
+[RStudio and Git](http://r-pkgs.had.co.nz/git.html)
+
+---
+
+## What is Git
+
+![dataflow](gitdataflow.png)
+
+---
+
+
+## What is Git
+
+Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
+
+- => 3 main commands: commit, push, and pull
+
+  - pull: update your local project with the latest version of the main project
+
+  - commit: add your latest contribution/modification
+
+  - push: merge your modifications with the main project
+  
+Simple commands are available in RStudio, otherwise you need to use Git from the shell ([Git cheat sheet](https://services.github.com/on-demand/downloads/github-git-cheat-sheet.pdf))
+
+---
+
+## Git platforms (share your code, collaborate)
+
+- [GitHub](https://github.com/magrichard), [documentation](https://guides.github.com/activities/hello-world/)
+
+- [GitLab UGA](https://gricad-gitlab.univ-grenoble-alpes.fr/), [documentation](https://docs.gricad-pages.univ-grenoble-alpes.fr/help/)
+
+- other...?
+
+---
+
+
+
+## Collaborative work on GitHub
+
+Option 1 - Equal collaborators: Everyone can pull, commit and push on the same 'master' branch
+
+Option 2 - One coordinator (master branch, owns the project) and one (or more) contributor:
+
+- Fork the original repo
+
+- Clone it, and link it to the master repo 
+
+`git remote add upstream https://github.com/magrichard/testgit.git`
+
+- Uptade your fork with latest changes form the master repo (fetch and merge) 
+
+`git pull upstream master`
+
+- Commit, push on your fork, and create a [Pull Request](https://help.github.com/articles/creating-a-pull-request/) (that will be reviewed and accepted by the master)
+
+
