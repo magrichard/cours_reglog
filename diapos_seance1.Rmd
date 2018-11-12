@@ -15,165 +15,139 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 # Plan
 
-I) Rappel
+I) Rappel (régression linéaire)
 II) Introduction à la regression logistique
 III) Formalisme et principe (modèle LOGIT)
 IV) Estimation des coefficients beta
 
 ---
 
-## I. Rappel (1/2)
+## I. Rappel (régression linéaire) (1/2)
 
-- Y est expliquée (modélisée) par  les variables explicatives $X= (X_1,X_2,...,X_p)$
-Si $p=1$, c’est une fonction affine de X
+Y est expliquée (modélisée) par  les variables explicatives $X= (X_1,X_2,...,X_p)$.
 
-- Modèle: $E(Y)  = bX= \beta_0 + \beta_1X_1 + … + \beta_pX_p$
+Si $p=1$, c’est une fonction affine de X.
+
+Modèle : $$E(Y)  = \beta X= \beta_0 + \beta_1X_1 + … + \beta_pX_p$$
+
 avec $\beta=(\beta_0, \beta_1, …, \beta_p)$ estimé par les moindres carrées 
 
 $$\beta = argmin(\sum_{i=1}^{n} {(y_i - \beta_0 - \beta_1x_{1,i} - ... - \beta_px_{p,i})^2)}$$ 
-*Sous l’hypothèse de normalité des résidus, l’estimateur des moindres carrés est équivalent à l’estimateur du maximum de vraisemblance pour la régression linéaire.*
+
+Sous l’hypothèse de normalité des résidus, l’estimateur des moindres carrés est équivalent à l’estimateur du maximum de vraisemblance pour la régression linéaire :
 
 - La valeur estimée (ajustée) de Y est $\widehat{y}_i =  \widehat{\beta}_0 + \widehat{\beta}_1X_1 +  … + \widehat{\beta}_pX_p$
-
 - Les résidus sont estimés par $e_i = y_i -\widehat{y}_i$
-
 - La variance du terme d’erreur est estimée par $s^2 = \frac{1}{n-2} \sum_{i=1}^{n}{e_i^2}$
 
----
-
-## I) Rappel (2/2)
-
-blabla
 
 ---
 
-## I) Exemple
+## I) Exemple : data_nutri
 
 ```{r}
 d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
 DT::datatable(d, width = "100%")
 #head(d)
 ```
 
 ---
 
-## I) Exemple
+## I) Exemple 1
 
 ```{r}
-#layout(matrix(1:2, 1), respect=TRUE)
-
+# README RStudio config, uncheck: # preferences > R Markdown > show output inline for... 
+layout(matrix(1:2, 1, byrow=TRUE), respect=TRUE)
 plot(d$taille, d$poids)
-# Y~B
+  ## Model
+# Y~X
 # E(Y) = b.X
 # E(Y) = b_0 + b_1.X
 # Y_i = b_0 + b_1.X_i + e_i
 m = lm(d$poids~d$taille)
-m = lm(poids~taille, d)
-#m$coefficients
-#m$residuals
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
-# arrows(d$taille, d$poids, d$taille+m$residuals, d$poids, col=adjustcolor(1, alpha.f=0.5))
-arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
+m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2) # /!\ y = b.x + a
+# residuals
+arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(4, alpha.f=0.5), length=0.1)
+legend("topleft",c("regression line", "residuals"), col=c(2,4), lty=1, cex=.8)
 ```
 
 ---
 
-## I) Exemple
+## I) Exemple 2
 
 ```{r}
 layout(matrix(1:2, 1), respect=TRUE)
-plot(d$taille, d$poids)
-# Y~B
-# E(Y) = b.X
-# E(Y) = b_0 + b_1.X
-# Y_i = b_0 + b_1.X_i + e_i
-m = lm(d$poids~d$taille)
-#m$coefficients
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
-plot(d$taille, d$poids-m$residuals, col=1)
-arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
-```
-
----
-
-## I) Exemple
-
-```{r}
-layout(matrix(1:2, 1), respect=TRUE)
-plot(d$sex, d$poids)
+plot(d$sex, d$poids, main="poids")
 m = lm(d$poids~d$sex)
 m$coefficients
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
-plot(1:nrow(d), d$poids-m$residuals, col=1)
-arrows(1:nrow(d), d$poids, 1:nrow(d), d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
+abline(h=m$coefficients[[1]], col=2)
+abline(h=m$coefficients[[1]] + m$coefficients[[2]], col=4)
+legend("bottomright",c("Intercept", "d$sexHomme"), col=c(2,4), lty=1)
+
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$sex, d$poids, main="poids")
+points(as.numeric(d$sex), d$poids)
+x = jitter(as.numeric(d$sex), 0.5)
+points(x, d$poids)
+arrows(x, d$poids, x, d$poids-m$residuals, col=adjustcolor(4, alpha.f=0.5), length=0.1)
+legend("bottomright",c("residuals"), col=c(4), lty=1, cex=0.6)
+
 ```
 
 ---
 
-## I) Exemple
-
-```{r}
-
-plot(1:nrow(d), d$poids-m$residuals, col=1)
-arrows(1:nrow(d), d$poids, 1:nrow(d), d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
-
-
-arrows(d$taille, d$poids, d$taille + 0.5*m$coefficients[[2]]*m$residuals, d$poids - sqrt(m$coefficients[[2]]*m$residuals), col=adjustcolor(1, alpha.f=0.5))
-
-
-arrows(d$taille, d$poids, d$taille + 0.5*m$coefficients[[2]]*m$residuals, d$poids - sqrt(m$coefficients[[2]]*m$residuals), col=adjustcolor(1, alpha.f=0.5))
-
-# plot( d$poids, d$taille)
-# m = lm(d$taille~d$poids)
-# m = lm(taille~poids, d)
-# m$coefficients
-# m$residuals
-# arrows(d$poids, d$taille, d$poids+m$residuals, d$taille, col=adjustcolor(1, alpha.f=0.5))
-# abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
-#
-
-plot(density(m$residuals))
-
-plot(d$sexe, d$taille)
-```
-
----
-
-## II) Introduction à la regression logistique: objectifs
+## II) Introduction à la regression logistique: objectifs et exemple de distribution
 
 - Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs autres covariables (quali ou quanti)
 
-- Exemple de variable à expliquer:
--> Maladie coronarienne en fonction d’HTA et cholestérol
--> Survenue de cancer en fonction d’expositions chimiques
--> Consommation d’un bien selon variables sociodémographiques
--> Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme…
+$$Y \sim X$$
 
-- Toute variable binaire peut être **codée en 0/1**, et est alors considérée comme une variable de Bernouilli de distribution: $P(Y =1) =p$,  $P(Y=0)=1-p$ et $P(Y=k)=p^k(1-p)^{1-k}$
+- Exemple de variable à expliquer : 
+  Maladie coronarienne en fonction d’HTA et cholestérol
+  ; Survenue de cancer en fonction d’expositions chimiques
+  ; Consommation d’un bien selon variables sociodémographiques
+  ; Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme.
+
+```{r}
+layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
+plot(d$poids, d$sex, main="sex~poids")
+s = as.numeric(d$sex)
+m = lm(s~d$poids)
+# m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=6) # /!\ y = b.x + a
+plot(d$poids, d$sex, main="sex~poids")
+# residuals
+arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1, lwd=3)
+legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
+# stop("EFN")
+plot(density(d$poids))
+```
 
 ---
 
-## II) Introduction à la regression logistique: Exemple de distribution
+## III) Formalisme : Variable de Bernoulli
 
-***TODO : graphique maladie en fonction de l'age
+- Toute variable binaire peut être **codée en 0/1**, et est alors considérée comme une Variable de Bernoulli de distribution:
+ 
+$$P(Y =1) =p$$
+$$P(Y=0)=1-p$$ 
+$$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$ 
 
-![ex](fig/coronary_disease.png)
-
-*Passer une droite entre ces points n’est pas idéal (les moindres carrés n’ont pas vraiment de sens….)*
-
----
 
 ## III) Formalisme : le principe
+ - On pose Y la variable binaire,
+ - X le vecteur des covariables/variables explicatives (qualitatives ou quantitatives)
+ - On veut modéliser $E(Y|X) = f(X)$ avec $E(Y|X) = P(Y=1|X)$ noté $\pi (X)=P(Y=1|X)$
 
-- On pose:
-Y la variable binaire
-X le vecteur des covariables/variables explicatives (qualitatives ou quantitatives)
+---
 
-- On veut modéliser:
+En moyenne, Y est une fonction de X
 
-$$ E(Y|X) = f(X) $$
-avec $$ E(Y|X) = P(Y=1|X) $$
+Idée intuitive : utiliser la régression linéaire  $E(Y|X) = \beta X$
+
+On va donc transformer E(Y|X) pour se ramener dans R
 
 ---
 
@@ -183,23 +157,75 @@ La fonction logit est définie de $[0,1]$ dans R par:
 $$	[0,1]	\rightarrow	R $$
 $$	p	\rightarrow	logit(p) = log(\frac{p}{1-p}) $$
 $$ \lim_{p\to0} logit(p) = -\infty $$
-	
 $$ \lim_{p\to1} logit(p) = +\infty $$
 
-*** TO DO: mettre un plot
+
+
+```{r}
+# [0,1] -> R
+#     p -> logit(p) = log(p/1-p)
+# logit = function(p) log(p/(1-p))
+x = 0:100/100
+layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
+plot(x, log(x/(1-x)), main="logit")
+```
+
+
+
+
+
+
+
+
 
 ---
 
 ## III) Formalisme : le modèle logistique
 
-- On utilise donc le modèle suivant:
-		$logit(E(Y|X))=βX$
-Qu’on appelle le modèle logistique
+- On utilise donc le modèle logistique:
+		
+    $$logit(E(Y|X)) = \beta X$$
 
-- Pour simplifier les formules, on va poser $\pi(X)=P(Y=1|X)$
-et ainsi $logit(\pi(X))= βX$ 
+- Pour simplifier les formules, on va poser $\pi (X)=P(Y=1|X)$
+et ainsi $logit(\pi (X))= \beta X$ 
 
-- Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients β*
+- Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
+
+
+
+```{r}
+layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
+s = as.numeric(d$sex) - 1
+plot(d$poids, s, main="sex~poids")
+m = lm(s~d$poids)
+m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=2) # /!\ y = b.x + a
+plot(d$poids, s, main="sex~poids")
+# residuals
+arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1)
+legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
+# stop("EFN")
+plot(density(d$poids))
+
+
+plot(d$poids, s, main="sex~poids")
+# P(Y=1|X) = logitinv(a + b.x)
+m = glm(d$sex~d$poids, family = binomial(logit))
+m$coefficients
+logitinv = function(x) 1/(1 + exp(-x))
+lines(140:180, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*140:180), col=2, lwd=2)
+
+plot(d$poids, s, main="sex~poids", xlab="X", ylab="Y")
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
+arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0, lwd=3)
+legend("bottomright",c("regression logit", "P(Y=1|X)"), col=c(2,4), lty=1, cex=0.6)
+```
+
+
+
 
 ---
 
@@ -236,9 +262,9 @@ Les paramètres                                    sont inconnus
 
 En passant au logarithme, on a 
 
-Cette fonction contient des valeurs observées yi et des valeurs prédites         qui dépendent de β
+Cette fonction contient des valeurs observées yi et des valeurs prédites         qui dépendent de $\beta$
 
-On maximise cette fonction en trouvant la valeur de β pour laquelle la dérivée (par rapport à β) est nulle  
+On maximise cette fonction en trouvant la valeur de $\beta$ pour laquelle la dérivée (par rapport à $\beta$) est nulle  
 définissant ainsi 
 
 ---
@@ -247,8 +273,8 @@ définissant ainsi
 
 - Il n’existe pas de solution analytique de
 L’estimation de    est donc fait par approximation (d’où des résultats potentiellement différents selon l’algorithme), avec souvent la démarche suivante:
-Le logiciel propose une première valeur pour β et calcule la vraisemblance associée
-Il cherche de nouvelles valeurs « plausibles » pour β et voit si elles améliorent la vraisemblance
+Le logiciel propose une première valeur pour $\beta$ et calcule la vraisemblance associée
+Il cherche de nouvelles valeurs « plausibles » pour $\beta$ et voit si elles améliorent la vraisemblance
 Et réitère cela jusqu’à atteindre une condition, eg. la différence de vraisemblance est <0.00001
 
 - L’estimateur     est estimé par le modèle, et non pas observé: sa valeur dépend du modèle utilisé et de la validité de celui-ci.
@@ -265,7 +291,7 @@ est efficace (i.e. de variance minimale parmi tous les estimateurs sans biais ob
 
 Ainsi:
 
-Avec      la matrice de variance-covariance de β 
+Avec      la matrice de variance-covariance de $\beta$ 
 
  On en déduit les intervalles de confiance pour  
 
