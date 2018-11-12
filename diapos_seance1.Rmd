@@ -15,8 +15,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 # Evaluation
 
- - individuelle sur un jeu de donnée (4 semaines, Régression Logistique)
- - data challenge ()
+ - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
+ - data challenge à la fin des séances "Régression Logistique" et "Survie"
 
 ---
 
@@ -24,12 +24,12 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 I) Rappel (régression linéaire)
 II) Introduction à la regression logistique
-III) Formalisme et principe (modèle LOGIT)
+III) Formalisme et principe (modèle logit)
 IV) Estimation des coefficients beta
 
 ---
 
-## I. Rappel (régression linéaire) (1/2)
+## I.  Régression linéaire (rappel) 
 
 Y est expliquée (modélisée) par  les variables explicatives $X= (X_1,X_2,...,X_p)$.
 
@@ -50,7 +50,7 @@ Sous l’hypothèse de normalité des résidus, l’estimateur des moindres carr
 
 ---
 
-## I) Exemple : data_nutri
+## I) Données : data_nutri
 
 ```{r}
 d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
@@ -86,7 +86,7 @@ legend("topleft",c("regression line", "residuals"), col=c(2,4), lty=1, cex=.8)
 
 ```{r}
 layout(matrix(1:2, 1), respect=TRUE)
-plot(d$sex, d$poids, main="poids")
+plot(d$sex, d$poids, main="poids~sex", xlab="sex", ylab="poids")
 ## Model
 # Y~X
 # E(Y) = b.X
@@ -98,8 +98,7 @@ abline(h=m$coefficients[[1]], col=2)
 abline(h=m$coefficients[[1]] + m$coefficients[[2]], col=4)
 legend("bottomright",c("b_0", "b_0+b_1"), col=c(2,4), lty=1, cex=.8)
 
-layout(matrix(1:2, 1), respect=TRUE)
-plot(d$sex, d$poids, main="poids")
+plot(d$sex, d$poids, main="poids~sex", xlab="sex", ylab="poids")
 points(as.numeric(d$sex), d$poids)
 x = jitter(as.numeric(d$sex), 0.5)
 points(x, d$poids)
@@ -116,7 +115,6 @@ Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs 
 $$Y \sim X$$
 $$E(Y|X)$$
 $$P(Y=1|X)$$
-$$P(Y=1|X)$$
 
 Exemple de variable à expliquer : 
   - Maladie coronarienne en fonction d’HTA et cholestérol
@@ -126,23 +124,23 @@ Exemple de variable à expliquer :
 
 ---
 
-## II) Introduction à la regression logistique : exemple de distribution
+## II) Exemple 3
 
 ```{r}
 layout(matrix(1:2, 1), respect=TRUE)
-plot(d$poids, d$sex, main="sex~poids")
+s = as.numeric(d$sex) - 1
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 ## Model
 # Y~X
 # E(Y) = b.X
 # E(Y) = b_0 + b_1.X
 # Y_i = b_0 + b_1.X_i + e_i
-s = as.numeric(d$sex)
 m = lm(s~d$poids)
 m$coefficients
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=6) # /!\ y = b.x + a
-plot(d$poids, d$sex, main="sex~poids")
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=2) # /!\ y = b.x + a
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 # residuals
-arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1, lwd=3)
+arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1, lwd=2)
 legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
 ```
 
@@ -169,9 +167,9 @@ $$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$
 
 ## III) Formalisme : 
 
-### Fonction LOGIT
+### Fonction logit
 
-La fonction logit est définie de $[0,1]$ dans R par:
+La fonction *logit* est définie de $[0,1]$ dans $R$ par:
 $$	[0,1]	\rightarrow	R $$
 $$	p	\rightarrow	logit(p) = log(\frac{p}{1-p}) $$
 $$ \lim_{p\to0} logit(p) = -\infty $$
@@ -181,7 +179,7 @@ $$ \lim_{p\to1} logit(p) = +\infty $$
 
 ---
 
-## III) Formalisme : la fonction LOGIT
+## III) Exemple 4 : la fonction logit
 
 ```{r}
 # logit: [0,1] -> R
@@ -214,36 +212,26 @@ Comme en régression linéaire, l’objet de cette modélisation est *d’estime
 
 ---
 
-## III) Formalisme : le modèle logistique
+## III) Exemple 5 : le modèle logistique
 
 ```{r}
-layout(matrix(1:2, 1), respect=TRUE)
-s = as.numeric(d$sex) - 1
-plot(d$poids, s, main="sex~poids")
-m = lm(s~d$poids)
-m$coefficients
-abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=2) # /!\ y = b.x + a
-plot(d$poids, s, main="sex~poids")
-# residuals
-arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1)
-legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
-# stop("EFN")
-
 
 layout(matrix(1:2, 1), respect=TRUE)
-plot(d$poids, s, main="sex~poids")
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
-m = glm(d$sex~d$poids, family = binomial(logit))
+m = glm(s~d$poids, family = binomial(logit))
 m$coefficients
 logitinv = function(x) 1/(1 + exp(-x))
-lines(140:180, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*140:180), col=2, lwd=2)
-plot(d$poids, s, main="sex~poids", xlab="X", ylab="Y")
+x = min(d$poids):max(d$poids)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
+legend("bottomright", "logit(Y)=b.X", col=2, lty=1, cex=0.6)
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 py1x = function(t,m) {
   x = m$coefficients[[1]] + m$coefficients[[2]]*t
   1/(1 + exp(-x))
 }
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
-legend("bottomright",c("regression logit", "P(Y=1|X)"), col=c(2,4), lty=1, cex=0.6)
+legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
 ```
 
 
@@ -317,7 +305,7 @@ $$\widehat{\beta}_n = argmax L_n(\beta)$$
 3) est de distribution normale
 4) est efficace (i.e. de variance minimale parmi tous les estimateurs sans biais obtenus avec d’autres méthodes).
 
-- Ainsi: $\lim_{n\to\infty} \sqrt{n}(\widehat{\beta}-\beta) \rightarrow N(0,\sum^{-1})$ avec $\sum^{-1}$ la matrice de variance-covariance de $\beta$ 
+- Ainsi: $\lim_{n\to\infty} \sqrt{n}(\widehat{\beta}-\beta) \rightarrow N(0,\Sigma^{-1})$ avec $\Sigma^{-1}$ la matrice de variance-covariance de $\beta$ 
 
 ---
 
