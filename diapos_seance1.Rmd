@@ -49,7 +49,7 @@ Sous l’hypothèse de normalité des résidus, l’estimateur des moindres carr
 d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
 d$sex = as.factor(d$sex)
 DT::datatable(d, width = "100%")
-#head(d)
+# head(d)
 ```
 
 ---
@@ -59,8 +59,8 @@ DT::datatable(d, width = "100%")
 ```{r}
 # README RStudio config, uncheck: # preferences > R Markdown > show output inline for... 
 layout(matrix(1:2, 1, byrow=TRUE), respect=TRUE)
-plot(d$taille, d$poids)
-  ## Model
+plot(d$taille, d$poids, main="poids~taille")
+## Model
 # Y~X
 # E(Y) = b.X
 # E(Y) = b_0 + b_1.X
@@ -80,11 +80,16 @@ legend("topleft",c("regression line", "residuals"), col=c(2,4), lty=1, cex=.8)
 ```{r}
 layout(matrix(1:2, 1), respect=TRUE)
 plot(d$sex, d$poids, main="poids")
+## Model
+# Y~X
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
 m = lm(d$poids~d$sex)
 m$coefficients
 abline(h=m$coefficients[[1]], col=2)
 abline(h=m$coefficients[[1]] + m$coefficients[[2]], col=4)
-legend("bottomright",c("Intercept", "d$sexHomme"), col=c(2,4), lty=1)
+legend("bottomright",c("b_0", "b_0+b_1"), col=c(2,4), lty=1, cex=.8)
 
 layout(matrix(1:2, 1), respect=TRUE)
 plot(d$sex, d$poids, main="poids")
@@ -98,60 +103,66 @@ legend("bottomright",c("residuals"), col=c(4), lty=1, cex=0.6)
 
 ---
 
-## II) Introduction à la regression logistique: objectifs et exemple de distribution
+## II) Introduction à la regression logistique : objectifs
 
-- Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs autres covariables (quali ou quanti)
-
+Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs autres covariables (quali ou quanti)
 $$Y \sim X$$
+$$E(Y|X)$$
+$$P(Y=1|X)$$
+$$P(Y=1|X)$$
 
-- Exemple de variable à expliquer : 
-  Maladie coronarienne en fonction d’HTA et cholestérol
-  ; Survenue de cancer en fonction d’expositions chimiques
-  ; Consommation d’un bien selon variables sociodémographiques
-  ; Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme.
+Exemple de variable à expliquer : 
+  - Maladie coronarienne en fonction d’HTA et cholestérol
+  - Survenue de cancer en fonction d’expositions chimiques
+  - Consommation d’un bien selon variables sociodémographiques
+  - Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme.
+
+---
+
+## II) Introduction à la regression logistique : exemple de distribution
 
 ```{r}
-layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
+layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, d$sex, main="sex~poids")
+## Model
+# Y~X
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
 s = as.numeric(d$sex)
 m = lm(s~d$poids)
-# m$coefficients
+m$coefficients
 abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2, lwd=6) # /!\ y = b.x + a
 plot(d$poids, d$sex, main="sex~poids")
 # residuals
 arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1, lwd=3)
 legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
-# stop("EFN")
-plot(density(d$poids))
 ```
 
 ---
 
-## III) Formalisme : Variable de Bernoulli
+## III) Formalisme : 
+
+### Variable de Bernoulli
 
 - Toute variable binaire peut être **codée en 0/1**, et est alors considérée comme une Variable de Bernoulli de distribution:
  
-$$P(Y =1) =p$$
+$$P(Y=1)=p$$
 $$P(Y=0)=1-p$$ 
 $$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$ 
 
 
-## III) Formalisme : le principe
+### Principe
+
  - On pose Y la variable binaire,
  - X le vecteur des covariables/variables explicatives (qualitatives ou quantitatives)
- - On veut modéliser $E(Y|X) = f(X)$ avec $E(Y|X) = P(Y=1|X)$ noté $\pi (X)=P(Y=1|X)$
+ - On veut modéliser $E(Y|X) = f(X)$ avec $E(Y|X) = P(Y=1|X)$ noté $\pi (X)$
 
 ---
 
-En moyenne, Y est une fonction de X
+## III) Formalisme : 
 
-Idée intuitive : utiliser la régression linéaire  $E(Y|X) = \beta X$
-
-On va donc transformer E(Y|X) pour se ramener dans R
-
----
-
-## III) Formalisme : la fonction LOGIT
+### Fonction LOGIT
 
 La fonction logit est définie de $[0,1]$ dans R par:
 $$	[0,1]	\rightarrow	R $$
@@ -161,10 +172,14 @@ $$ \lim_{p\to1} logit(p) = +\infty $$
 
 
 
+---
+
+## III) Formalisme : la fonction LOGIT
+
 ```{r}
-# [0,1] -> R
-#     p -> logit(p) = log(p/1-p)
-# logit = function(p) log(p/(1-p))
+# logit: [0,1] -> R
+#            p -> log(p/1-p)
+# logit(p) = log(p/1-p)
 x = 0:100/100
 layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
 plot(x, log(x/(1-x)), main="logit")
@@ -182,19 +197,20 @@ plot(x, log(x/(1-x)), main="logit")
 
 ## III) Formalisme : le modèle logistique
 
-- On utilise donc le modèle logistique:
-		
+On utilise donc le modèle logistique:
     $$logit(E(Y|X)) = \beta X$$
+    $$logit(P(Y=1|X))= \beta X$$ 
+    $$logit(\pi (X))= \beta X$$ 
 
-- Pour simplifier les formules, on va poser $\pi (X)=P(Y=1|X)$
-et ainsi $logit(\pi (X))= \beta X$ 
-
-- Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
+Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
 
 
+---
+
+## III) Formalisme : le modèle logistique
 
 ```{r}
-layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
+layout(matrix(1:2, 1), respect=TRUE)
 s = as.numeric(d$sex) - 1
 plot(d$poids, s, main="sex~poids")
 m = lm(s~d$poids)
@@ -205,22 +221,21 @@ plot(d$poids, s, main="sex~poids")
 arrows(d$poids, s, d$poids, s-m$residuals, col=adjustcolor(4, alpha.f=0.2), length=0.1)
 legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0.6)
 # stop("EFN")
-plot(density(d$poids))
 
 
+layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, s, main="sex~poids")
 # P(Y=1|X) = logitinv(a + b.x)
 m = glm(d$sex~d$poids, family = binomial(logit))
 m$coefficients
 logitinv = function(x) 1/(1 + exp(-x))
 lines(140:180, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*140:180), col=2, lwd=2)
-
 plot(d$poids, s, main="sex~poids", xlab="X", ylab="Y")
 py1x = function(t,m) {
   x = m$coefficients[[1]] + m$coefficients[[2]]*t
   1/(1 + exp(-x))
 }
-arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0, lwd=3)
+arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
 legend("bottomright",c("regression logit", "P(Y=1|X)"), col=c(2,4), lty=1, cex=0.6)
 ```
 
