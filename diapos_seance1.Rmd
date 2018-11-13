@@ -1,7 +1,7 @@
 ---
 title: "Régression Logistique"
 subtitle: "Séance 1"
-author: "Florent Chuffart & Magali Richard"
+author: "Florent Chuffart & Magali Richard (d'après le cours de Lydiane Agier)"
 date: "13 Novembre 2018"
 output: slidy_presentation
 ---
@@ -11,12 +11,21 @@ options(htmltools.dir.version = FALSE, width = 75)
 knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.width = "100%")
 ```
 
+---
 
-
-# Evaluation
+## Evaluation
 
  - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
  - data challenge à la fin des séances "Régression Logistique" et "Survie"
+
+## Pré-requis
+ 
+ - R https://cran.r-project.org 
+ - RStudio https://www.rstudio.com
+
+## Cours 
+
+- https://github.com/magrichard/cours_reglog
 
 ---
 
@@ -113,10 +122,11 @@ legend("bottomright",c("residuals"), col=c(4), lty=1, cex=0.6)
 
 Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs autres covariables (quali ou quanti)
 $$Y \sim X$$
-$$E(Y|X)$$
-$$P(Y=1|X)$$
+$$E(Y|X) \sim X$$
 
 Exemple de variable à expliquer : 
+  
+  - Le sexe en fonction du poids
   - Maladie coronarienne en fonction d’HTA et cholestérol
   - Survenue de cancer en fonction d’expositions chimiques
   - Consommation d’un bien selon variables sociodémographiques
@@ -170,10 +180,14 @@ $$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$
 ### Fonction logit
 
 La fonction *logit* est définie de $[0,1]$ dans $R$ par:
-$$	[0,1]	\rightarrow	R $$
-$$	p	\rightarrow	logit(p) = log(\frac{p}{1-p}) $$
-$$ \lim_{p\to0} logit(p) = -\infty $$
-$$ \lim_{p\to1} logit(p) = +\infty $$
+$$	logit:[0,1]	\rightarrow	R $$
+$$	x	\rightarrow	logit(x) = log(\frac{x}{1-x}) $$
+$$ \lim_{x\to0} logit(x) = -\infty $$
+$$ \lim_{x\to1} logit(x) = +\infty $$
+
+La fonction *logit* s’inverse :
+$$	logit^{-1}: R 	\rightarrow	[0,1] $$
+$$	x	\rightarrow	logit^{-1}(x) = \frac{1}{1 + e^{-x}} $$
 
 
 
@@ -188,6 +202,7 @@ $$ \lim_{p\to1} logit(p) = +\infty $$
 x = 0:100/100
 layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
 plot(x, log(x/(1-x)), main="logit")
+plot(log(x/(1-x)), x, main="logit^-1")
 ```
 
 
@@ -206,6 +221,7 @@ On utilise donc le modèle logistique:
     $$logit(E(Y|X)) = \beta X$$
     $$logit(P(Y=1|X))= \beta X$$ 
     $$logit(\pi (X))= \beta X$$ 
+    $$\pi (X)= logit^{-1}(\beta X)$$ 
 
 Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
 
