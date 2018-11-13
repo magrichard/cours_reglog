@@ -15,8 +15,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ## Evaluation
 
- - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
- - data challenge à la fin des séances "Régression Logistique" et "Survie"
+ - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique" 
+ - data challenge à la fin des séances "Régression Logistique" et "Survie" (23 janvier 2019)
 
 ## Pré-requis
  
@@ -85,6 +85,7 @@ m = lm(d$poids~d$taille)
 m$coefficients
 abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2) # /!\ y = b.x + a
 # residuals
+m$residuals
 arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(4, alpha.f=0.5), length=0.1)
 legend("topleft",c("regression line", "residuals"), col=c(2,4), lty=1, cex=.8)
 ```
@@ -114,6 +115,21 @@ points(x, d$poids)
 arrows(x, d$poids, x, d$poids-m$residuals, col=adjustcolor(4, alpha.f=0.5), length=0.1)
 legend("bottomright",c("residuals"), col=c(4), lty=1, cex=0.6)
 
+# t.test
+# 1 null hypothesis
+# H_0: p_h==_f
+# H_1: p_h!=p_f
+# 2 risk
+# alpha = 5%
+# 3 test hypothesis
+# residuals~N?
+shapiro.test(d[d$sex=="Femme",]$poids)
+shapiro.test(d[d$sex=="Homme",]$poids)
+# -> OK
+# 4 t.test
+t.test(d[d$sex=="Femme",]$poids, d[d$sex=="Homme",]$poids)
+anova(m)
+# 5 conclusion
 ```
 
 ---
@@ -263,7 +279,7 @@ legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
 
 - On note les covariables globales théoriques: $X=(X_1,...,X_p)$ et observées : $x=(x_1,...,x_p)$. Les covariables individuelles observées sont notées : $x_i=(x_{1i},...,x_{pi})$
 
-- Le modèle conditionnel de $Y$ sachant $X$ est: $(Y|X = x) \sim B(\pi(x))$
+- Le modèle conditionnel de $Y$ sachant $X$ est: $E(Y|X = x) \sim B(\pi(x))$
 
 - Pour l’observation $i$, la contribution à la vraisemblance est donc:
 $$l(x_i, y_i) = P(y_i = 1|x_i)^{y_i} (1-P(y_i=1|x_i))^{1-y_i} = \pi(x_i)^{y_i}(1-\pi(x_i))^{1-y_i} $$
@@ -350,3 +366,58 @@ i.e. la probabilité estimée de $Y=1$ pour chaque individu en fonction de ses c
 
 Ceux-ci peuvent servir à estimer l‘adéquation du modèle aux données (vus plus loin)
 
+
+
+---
+
+# Exemple 6
+```{r}
+
+m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+m$coefficients
+summary(m)
+
+layout(matrix(1:2, 1, byrow=TRUE), respect=TRUE)
+plot(d$taille, d$poids, main="poids~taille", col=s+1)
+## Model
+# Y~X
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
+m = lm(d$poids~d$taille)
+m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2) # /!\ y = b.x 
+
+
+
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+m = glm(s~d$poids, family = binomial(logit))
+m$coefficients
+logitinv = function(x) 1/(1 + exp(-x))
+x = min(d$poids):max(d$poids)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
+arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
+legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
+
+plot(d$taille, s, main="sex~taille", xlab="taille", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+m = glm(s~d$taille, family = binomial(logit))
+m$coefficients
+logitinv = function(x) 1/(1 + exp(-x))
+x = min(d$taille):max(d$taille)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
+arrows(d$taille, s, d$taille, py1x(d$taille,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
+legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
+
+
+```
