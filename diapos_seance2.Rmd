@@ -15,7 +15,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ## Evaluation
 
- - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique" 
+ - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
+ 
  - data challenge à la fin des séances "Régression Logistique" et "Survie" (23 janvier 2019)
 
 ## Pré-requis
@@ -92,7 +93,7 @@ legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0
 
 ## I) Rappel regression logistique : le modèle logistique
 
-On utilise donc le modèle logistique:
+On utilise le modèle logistique:
     $$logit(E(Y|X)) = \beta X$$
     $$logit(P(Y=1|X))= \beta X$$ 
     $$logit(\pi (X))= \beta X$$ 
@@ -106,15 +107,14 @@ Comme en régression linéaire, l’objet de cette modélisation est *d’estime
 ## I) Rappel regression logistique : estimation
 
 - Le modèle s’écrit:  $logit(E(Y|X_1,...,X_p)) = \beta_0 + \beta_1X_1+...+\beta_pX_p$
+
 Les paramètres $\beta = (\beta_0,\beta_1, ..., \beta_p)$ sont inconnus
 
 - On estime $\beta$ par **maximum de vraisemblance** : $\widehat{\beta}_n = argmax L_n(\beta)$
 
-- L’estimation de  $\widehat{\beta}$  est donc fait **par approximation**.
+- L’estimation de  $\widehat{\beta}$  est donc faite **par approximation**. Sa valeur **dépend du modèle utilisé et de la validité de celui-ci**.
 
-- L’estimateur $\widehat{\beta}$ est estimé par le modèle, et non pas observé: sa valeur **dépend du modèle utilisé et de la validité de celui-ci**.
-
-- On en déduit les **intervalles de confiance** pour $\beta_k$:
+- On en déduit les **intervalles de confiance** pour $\beta_k$: $$ IC(\widehat{\beta}) = \Big[\widehat{\beta_k} -t_{1-\alpha/2,n-2} * \sqrt{\widehat{var}(\widehat{\beta_k})} ; \widehat{\beta_k}+t_{1-\alpha/2,n-2} * \sqrt{\widehat{var}(\widehat{\beta_k})} \Big]$$
 
 - A partir de $\widehat{\beta}$ , on peut calculer:
 
@@ -173,11 +173,24 @@ $$ OR_{u/\nu} = \frac{odd(X = u)}{odd(X=\nu)} $$
 
 ## II) Exemple Odds Ratio
 
+**!! RR n’est pas directement calculable**
+
 ```{r}
 m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
 m$coefficients
 summary(m)$coefficient
 ```
+
+```{r}
+#Coefficient for weight effect
+summary(m)$coefficient[2,1]
+```
+
+```{r}
+#IC
+confint.default(m)
+```
+ 
 
 ```{r}
 #Odds ratio for weight effect
@@ -189,7 +202,7 @@ exp(summary(m)$coefficient[3,1])
 #Odds ratio for age effect
 exp(summary(m)$coefficient[4,1])
 ```
- **!! RR n’est pas directement calculable**
+
 ---
 
 ##  II) Quelle mesure choisir?
@@ -325,4 +338,25 @@ Rappels sur les tests
 
 Si on a p-valeur du test=4%, c’est que si $H_0$ est vrai, et qu’on répétait la simulation 100 fois, on aurait obtenu 4 fois une valeur de statistique de test égale ou plus extrême que celle observée.
 
+---
+
+## Evaluation
+
+### Sujet
+
+On s'intéresse à la méthylation de l'ADN sur différents tissus humains (187 échantillons). Pour certains échantillons, le genre est manquant. Utilisez les valeurs de méthylation pour **imputer le sexe** des échantillons lorsqu'il n'est pas connu.
+
+Veuillez restituer votre travail sous le format d'un PDF de deux pages (graphiques compris) en décrivant la méthode que vous avez choisie, en expliquant les choix que vous avez effectués et en analysant vos résultats. 
+
+Ce travail est à renvoyer par e-mail avant le *mardi 27 novembre 2018 (minuit)* à :
+
+- magali.richard@univ-grenoble-alpes.fr & florent.chuffart@univ-grenoble-alpes.fr 
+
+ Le sujet (avec les données et un exemple) est disponible [ici](sujet_controle_continu.pdf)
+ 
+---
+
+## Mise en pratique
+
+Quelques exercices à réaliser sous R disponibles [ici](TD.pdf)
 
