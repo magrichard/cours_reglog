@@ -129,9 +129,9 @@ Les paramètres $\beta = (\beta_0,\beta_1, ..., \beta_p)$ sont inconnus
 
 En d'autres mots: quel est l'effet de la variable $X_k$ sur $logit(P(Y=1|X))$
 
- $logit(\pi(X)=\beta X)$ <=> $log \Big(\frac{\pi(X)}{1-\pi(X)}\Big) =\beta X$
+ $logit(\pi(X)=\beta X) \iff log \Big(\frac{\pi(X)}{1-\pi(X)}\Big) =\beta X$
 
-On defini $Odds(X) = \frac{\pi(X)}{1-\pi(X)}$ <=> $Odds(X) = e^{(\beta X)}$
+On defini $Odds(X) = \frac{\pi(X)}{1-\pi(X)} \iff Odds(X) = e^{(\beta X)}$
 
 *Exemple* : si un étudiant a 3 chances sur 4 d’être reçu, contre 1 chance sur 4 d’être collé, sa cote est de « 3 contre 1 », soit $Odds=\frac{3/4}{1/4}=3$
 
@@ -140,12 +140,50 @@ On defini $Odds(X) = \frac{\pi(X)}{1-\pi(X)}$ <=> $Odds(X) = e^{(\beta X)}$
 
 ---
 
+# Exemple
+```{r}
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+m = glm(s~d$poids, family = binomial(logit))
+m$coefficients
+logitinv = function(x) 1/(1 + exp(-x))
+x = min(d$poids):max(d$poids)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
+py1x = function(t,m) {
+ x = m$coefficients[[1]] + m$coefficients[[2]]*t
+ 1/(1 + exp(-x))
+}
+arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
+legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
+
+
+x = min(d$poids):max(d$poids)
+plot(x,log(logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x) / (1-logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x))), ylab="logit(poids)", xlab="poids", main="logit(poids)=b.poids")
+plot(x,logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x) / (1-logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x)), ylab="pi(poids) / (1-pi(poids))", xlab="poids", main="Odd(poids)")
+plot(x,exp(m$coefficients[[1]] + m$coefficients[[2]]*x), ylab="exp(b.poids)", xlab="poids", main="Odd(poids)")
+abline(v=72, h=exp(m$coefficients[[1]] + m$coefficients[[2]]*72), col=2)
+
+x = 72
+exp(m$coefficients[[1]] + m$coefficients[[2]]*72)
+```
+---
+
+
+
+
+
+
+
+
+
+
+
 ##  II) Risque relatif ou risk ratio (RR)
 
 - *Définition* : On définit le **risque relatif** par 
 
-$$ RR_{u/\nu} = \frac{\pi(X = u)}{\pi(X=\nu)} = \frac{P(U=1|X=u)}{P(Y=1|x
-=\nu)} $$
+$$ RR_{u/\nu} = \frac{\pi(X = u)}{\pi(X=\nu)} = \frac{P(U=1|X=u)}{P(Y=1|X=\nu)} $$
 
 /!\ $X$ (et donc $u$ et $\nu$) peut etre de dimension >1, i.e. définir plus d’une caractéristique
 

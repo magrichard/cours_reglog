@@ -405,6 +405,19 @@ py1x = function(t,m) {
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
 legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
 
+
+x = min(d$poids):max(d$poids)
+plot(x,log(logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x) / (1-logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x))))
+plot(x,logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x) / (1-logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x)))
+plot(x,exp(m$coefficients[[1]] + m$coefficients[[2]]*x))
+
+x = 72
+logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x) / (1-logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x))
+
+
+
+
+
 plot(d$taille, s, main="sex~taille", xlab="taille", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
 m = glm(s~d$taille, family = binomial(logit))
