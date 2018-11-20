@@ -67,7 +67,21 @@ DT::datatable(d, width = "100%")
 
 ---
 
-## I) Rappel regression logistique: exemple sex ~ poids
+## I) Rappel regression linéaire : exemple sex ~ poids
+
+Y est expliquée (modélisée) par  les variables explicatives $X= (X_1,X_2,...,X_p)$.
+
+Si $p=1$, c’est une fonction affine de X.
+
+Modèle : $$E(Y)  = \beta X= \beta_0 + \beta_1X_1 + … + \beta_pX_p$$
+
+avec $\beta=(\beta_0, \beta_1, …, \beta_p)$ estimé par les moindres carrées 
+
+---
+
+## I) Rappel regression linéaire : exemple sex ~ poids
+
+
 
 ```{r}
 # README RStudio config, uncheck: # preferences > R Markdown > show output inline for...
@@ -89,6 +103,26 @@ legend("bottomright",c("regression line", "residuals"), col=c(2,4), lty=1, cex=0
 
 ```
 
+
+
+---
+
+## I) Rappel regression logistique : le modèle logistique
+
+On utilise le modèle logistique:
+$$	x	\rightarrow	logit(x) = log(\frac{x}{1-x}) $$
+    $$logit(E(Y|X)) = \beta X$$
+    $$logit(P(Y=1|X))= \beta X$$ 
+    $$logit(\pi (X))= \beta X$$ 
+    $$\pi (X)= logit^{-1}(\beta X)$$ 
+
+Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
+
+---
+
+## I) Rappel regression logistique: exemple sex ~ poids
+
+
 ```{r}
 
 layout(matrix(1:2, 1), respect=TRUE)
@@ -106,21 +140,8 @@ py1x = function(t,m) {
   1/(1 + exp(-x))
 }
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
-legend("bottomright","1 - P(Y|X)", col=4, lty=1, cex=0.6)
+legend("bottomright","1 - lP(Y|X)", col=4, lty=1, cex=0.6)
 ```
-
----
-
-## I) Rappel regression logistique : le modèle logistique
-
-On utilise le modèle logistique:
-    $$logit(E(Y|X)) = \beta X$$
-    $$logit(P(Y=1|X))= \beta X$$ 
-    $$logit(\pi (X))= \beta X$$ 
-    $$\pi (X)= logit^{-1}(\beta X)$$ 
-
-Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
-
 
 ---
 
@@ -149,7 +170,7 @@ Les paramètres $\beta = (\beta_0,\beta_1, ..., \beta_p)$ sont inconnus
 
 En d'autres mots: quel est l'effet de la variable $X_k$ sur $logit(P(Y=1|X))$
 
- $logit(\pi(X)=\beta X) \iff log \Big(\frac{\pi(X)}{1-\pi(X)}\Big) =\beta X$
+ $logit(\pi(X))=\beta X \iff log \Big(\frac{\pi(X)}{1-\pi(X)}\Big) =\beta X$
 
 On defini $Odds(X) = \frac{\pi(X)}{1-\pi(X)} \iff Odds(X) = e^{(\beta X)}$
 
