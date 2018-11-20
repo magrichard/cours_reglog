@@ -224,7 +224,7 @@ exp(m$coefficients[[1]] + m$coefficients[[2]]*72)
 
 - *Définition* : On définit le **risque relatif** par 
 
-$$ RR_{u/\nu} = \frac{\pi(X = u)}{\pi(X=\nu)} = \frac{P(U=1|X=u)}{P(Y=1|X=\nu)} $$
+$$ RR_{u/\nu} = \frac{\pi(X = u)}{\pi(X=\nu)} = \frac{P(Y=1|X=u)}{P(Y=1|X=\nu)} $$
 
 /!\ $X$ (et donc $u$ et $\nu$) peut etre de dimension >1, i.e. définir plus d’une caractéristique
 
@@ -253,6 +253,17 @@ $$ OR_{u/\nu} = \frac{odd(X = u)}{odd(X=\nu)} $$
 ## II) Exemple Odds Ratio
 
 **!! RR n’est pas directement calculable**
+
+-> Pour une variable $X_1$ binaire
+
+Avec $logit(E(Y|X_1)) = \beta X = \beta_0 + \beta_1X_1$
+
+$$ OR_{1/0} = \frac{Odd(X_1=1)}{Odd(X_1=0)} = \frac{e^{(\widehat\beta_0 + \widehat\beta_1)}}{e^{(\widehat\beta_0)}} = e^{(\widehat\beta_1)} $$
+-> Pour une variable $X_1$ quantitative:
+
+L’estimateur de $β_1$: permet d’avoir l’odds ratio quand $X_1$ augmente d’une unité
+
+$$ OR = e^{(\widehat\beta_1)} $$
 
 ```{r}
 m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
