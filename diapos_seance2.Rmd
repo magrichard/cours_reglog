@@ -331,7 +331,7 @@ $$ \sqrt{n\Sigma^{1/2}}(\widehat{\beta}-\beta) \rightarrow \mathcal{N}(0,I_p) $$
 $$ T =n(\widehat\beta-\beta)'\widehat\Sigma^{-1}(\widehat\beta-\beta) \xrightarrow[]{L} \mathcal{X}^2_p $$
 avec $n$ le nombre d'observations et $p$ le nombre de paramètres testés.
 
-Rq, pour un unique paramètre on a $T = \Big(\frac {\widehat\beta_k} {\widehat\sigma_{\widehat\beta_k}}\Big) \sim \mathcal{X}^2_p$
+Rq, pour un unique paramètre on a $T = \Big(\frac {\widehat\beta_k} {\widehat\sigma_{\widehat\beta_k}}\Big)^2 \sim \mathcal{X}^2_p$
 
 - On rejette $H_0$ si: 
 $$T>z^p_{1-\alpha}$$
