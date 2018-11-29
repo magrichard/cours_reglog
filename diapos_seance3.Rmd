@@ -39,52 +39,46 @@ III) Réduction de variables
 
 ---
 
-## I) Rappel régression logistique: 
+## I) Rappel régression logistique : 
+
 ### Principe
 
 Objectif : Modéliser une **variable binaire** en fonction d’une ou plusieurs autres covariables (quali ou quanti)
 $$Y \sim X$$
 $$E(Y|X) \sim X$$
 
-Exemple de variable à expliquer : 
-  
-  - Le sexe en fonction du poids
-  - Maladie coronarienne en fonction d’HTA et cholestérol
-  - Survenue de cancer en fonction d’expositions chimiques
-  - Consommation d’un bien selon variables sociodémographiques
-  - Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme.
+Par exemple, on cherche à connaitre la probabilité qu’un individu soit un homme sachant sa taille, son poids, ses habitudes alimentaires.
+
+### La fonction *logit*
 
 
----
+\begin{eqnarray}
+              \text{logit: } ]0,1[ & \rightarrow & \mathbb{R} \\
+                                 x & \rightarrow & logit(x)  =  log(\frac{x}{1-x}) \\ 
+logit^{-1}(y) = \frac{1}{1+e^{-y}} & \rightarrow & y
+\end{eqnarray}
 
-## I) Données : 
-### data_nutri
 
-```{r}
-d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
-d$sex = as.factor(d$sex)
-s = as.numeric(d$sex) - 1
-DT::datatable(d, width = "100%")
-# head(d)
-```
+
+### La régression logistique
+
+Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$* :
+
+
+\begin{eqnarray}
+         logit(E(Y|X))    & = & \beta X             \\
+          logit(P(Y=1|X)) & = & \beta X             \\
+           logit(\pi(X)) & = & \beta X             \\
+                  \pi(X) & = & logit^{-1}(\beta X) 
+\end{eqnarray}
+
+On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
+
+
 
 ---
 
 ## I) Rappel regression logistique : 
-### Le modèle logistique
-
-On utilise le modèle logistique:
-$$	x	\rightarrow	logit(x) = log(\frac{x}{1-x}) $$
-    $$logit(E(Y|X)) = \beta X$$
-    $$logit(P(Y=1|X))= \beta X$$ 
-    $$logit(\pi (X))= \beta X$$ 
-    $$\pi (X)= logit^{-1}(\beta X)$$ 
-
-Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
-
----
-
-## I) Rappel regression logistique: 
 ### Exemple sex ~ poids
 
 
@@ -98,123 +92,122 @@ m$coefficients
 logitinv = function(x) 1/(1 + exp(-x))
 x = min(d$poids):max(d$poids)
 lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
-legend("bottomright", "logit(Y)=b.X", col=2, lty=1, cex=0.6)
+legend("bottomright", "Y = Pi(X) = logit^-1(b.X)", col=2, lty=1, cex=0.6)
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
-py1x = function(t,m) {
-  x = m$coefficients[[1]] + m$coefficients[[2]]*t
-  1/(1 + exp(-x))
+py1x = function(poids,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*poids
+  logitinv(x)
 }
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
-legend("bottomright","1 - lP(Y|X)", col=4, lty=1, cex=0.6)
+legend("bottomright","1 - P(Y|X)", col=4, lty=1, cex=0.6)
 ```
 
 ---
 
-## I) Rappel regression logistique : 
-### Estimation
+##  I) Rappel regression logistique :
 
-- Le modèle s’écrit:  $logit(E(Y|X_1,...,X_p)) = \beta_0 + \beta_1X_1+...+\beta_pX_p$
+ 
+### Les mesures d'interêt
 
-Les paramètres $\beta = (\beta_0,\beta_1, ..., \beta_p)$ sont inconnus
+Comment interpréter $\widehat{\beta_k}$ ?  Quel est l‘effet de la variable $X_k$ sur $logit(P(Y=1|X))$ ?
 
-- On estime $\beta$ par **maximum de vraisemblance** : $\widehat{\beta}_n = argmax L_n(\beta)$
 
-- L’estimation de  $\widehat{\beta}$  est donc faite **par approximation**. Sa valeur **dépend du modèle utilisé et de la validité de celui-ci**.
+- *Définition*  **odds** 
 
-- On en déduit les **intervalles de confiance** pour $\beta_k$: $$ IC(\widehat{\beta}) = \Big[\widehat{\beta_k} -t_{1-\alpha/2,n-2} * \sqrt{\widehat{var}(\widehat{\beta_k})} ; \widehat{\beta_k}+t_{1-\alpha/2,n-2} * \sqrt{\widehat{var}(\widehat{\beta_k})} \Big]$$
+$$Odds(X) = \frac{\pi(X)}{1-\pi(X)} \iff Odds(X) = e^{\beta X}$$
 
-- A partir de $\widehat{\beta}$ , on peut calculer:
+- *Définition*  **odds ratio** 
 
-1) les **valeurs prédites** : $\pi(X)$ 
-2) les **résidus** : $\epsilon = Y - \widehat{\pi}(X)$
-
----
-
-##  I) Rappel regression logistique: 
-### Les mesures d'interet RR et OR (1/2)
-
-**Comment interpréter $\widehat{\beta_k}$ ?**
-
-En d'autres mots: quel est l'effet de la variable $X_k$ sur $logit(P(Y=1|X))$
-
-- *Définition* : On définit le **risque relatif** par 
+$$ OR_{u/\nu} = \frac{odd(X = u)}{odd(X=\nu)} = e^{\beta (u-v)}$$
+ 
+ 
+- *Définition* **risque relatif** 
 
 $$ RR_{u/\nu} = \frac{\pi(X = u)}{\pi(X=\nu)} = \frac{P(Y=1|X=u)}{P(Y=1|X=\nu)} $$
 
 
-- *Définition* : On définit le **odds ratio** par 
 
-$$ OR_{u/\nu} = \frac{odd(X = u)}{odd(X=\nu)} $$
+**$OR$ est directement calculable à partir des coefficients de la régression $\beta$**
 
-avec $Odds(X) = \frac{\pi(X)}{1-\pi(X)} \iff Odds(X) = e^{(\beta X)}$
+$OR$ estime le rapport malades/non-malades et $RR$ estime le risque (i.e. la probabilité) d’être malade.
 
-- $OR$ estime le rapport malades/non-malades et $RR$ estime le risque (i.e. la probabilité) d’être malade.
+Ils donnent la même indication sur la relation entre $Y$ et $X$ :
+
+1) Si $RR_{u/\nu}$ (ou $OR_{u/\nu}$) $>1$ alors il y a plus de risque de $Y=1$ si $X=u$ que si $X=\nu$
+2) Si $RR_{u/\nu}$ (ou $OR_{u/\nu}$) $<1$ alors il y a moins de risque de $Y=1$ si $X=u$ que si $X=\nu$
+3) Si $RR_{u/\nu}$ (ou $OR_{u/\nu}$) $=1$ alors $Y$ n’est pas influencée par $X=u$ vs. $X=\nu$ (i.e. Y indépendant des catégories $u$ et $\nu$ de $X$)
+
 
 ---
 
-##  I) Rappel regression logistique:
-### Les mesures d'interet RR et OR (2/2)
+##  I) Rappel regression logistique :
 
-- $OR$ estime le rapport malades/non-malades et $RR$ estime le risque (i.e. la probabilité) d’être malade.
+### La significativité du paramêtre $\beta_k$
 
-- Ils donnent la même indication sur la relation entre $Y$ et $X$:
-1) Si $RR_{u/\nu}>1$ / $OR_{u/\nu}>1$ => il y a plus de risque de $Y=1$ si $X=u$ que si $X=\nu$
-2) Si $RR_{u/\nu}<1$ / $OR_{u/\nu}<1$ => il y a moins de risque de $Y=1$ si $X=u$ que si $X=\nu$
-3) Si $RR_{u/\nu}=1$ / $OR_{u/\nu}=1$ => $Y$ n’est pas influencée par $X=u$ vs. $X=\nu$ (i.e. Y indépendant des catégories $u$ et $\nu$ de $X$)
+On veut tester l’influence du facteur $X_k$. 
 
-- **$OR$ directement calculable à partir des coefficients de régression $\beta$**
+$$\left\lbrace
+\begin{array}{l}
+H_0 : {\beta_k = 0} \\
+H_1 : {\beta_k \neq 0}
+\end{array}
+\right.$$
 
----
+Test de Wald pour un unique paramètre : $T = \Big(\frac {\widehat\beta_k} {\widehat\sigma_{\widehat\beta_k}}\Big)^2 \sim \mathcal{X}^2_1$
 
-##  I) Rappel regression logistique:
-### Les test de significativité
+### Comparaison de modèles emboités
 
-- On veut tester l’influence de $X_k$. On teste: $$H_0 : {\beta_k = 0}$$	vs. $$H_1 : {\beta_k \neq 0}$$
+On veut tester si l’ajout de paramètres est pertinent.
 
-- Ces tests peuvent  être utilisés pour **comparer des modèles**, ils sont aussi utiles pour **tester une variable catégorielle** en testant conjointement toutes ses catégories. 
+ - Soit $m_1$ un modèle emboité dans $m_2$ (*i.e.* toutes les variables de $m_1$ sont dans $m_2$)
+ - $m_2$ comprend $p$ variables explicatives supplémentaires par rapport à $m_1$
+ - $L_1$ est la valeur de vraisemblance de $m_1$
+ - $L_2$ est la valeur de vraisemblance de $m_2$
+ 
+Test du rapport de vraisemblance : $T = -2(log(L_1) - log(L_2)) \sim \mathcal{X}^2_p$
 
-- Test de Wald, pour un unique paramètre on a $T = \Big(\frac {\widehat\beta_k} {\widehat\sigma_{\widehat\beta_k}}\Big)^2 \sim \mathcal{X}^2_p$
-
-
-- Test du rapport de vraisemblance. Avec, $L1$ la valeur de vraisemblance de mod1 et $L2$ la valeur de vraisemblance de mod2. On a: $T = -2[log(L_1) - log(L_2)] \rightarrow \mathcal{X}^2_p$
 
 ---
 
 ## II) Adéquation du modèle
 
-- Comment mesurer si le modèle construit **prédit de façon efficace** les données observées?
+Comment mesurer si le modèle construit **prédit de façon efficace** les données observées ?
 
-- Mesurer l’**adéquation** du modèle **aux données** c’est étudier essentiellement:
+Mesurer l’**adéquation** du modèle **aux données** c’est étudier essentiellement :
 
---> L’*écart global* entre les valeurs prédites et les valeurs observées (i.e. mesures globales)
+- L’*écart global* entre les valeurs prédites et les valeurs observées (i.e. mesures globales)
 
---> La *contribution de chaque observation* au modèle
+-- Calibration du modèle (concordance entre les valeurs prédites et observées) : **Test de Hosmer-Lemeshow**
+
+-- Pouvoir discriminant du modèle :  courbe **ROC** et critère **AUC** (Area Under Curve)
+
+
+- La *contribution* de chaque observation au modèle (détection des outliers)
+
+-- Résidus de Pearson 
+
+-- Résidus de déviance
+
+
 
 ---
 
-## II) Mesures globales
+## II)  Adéquation du modèle : Test de Howmer-Lemeshow
 
-- Calibration du modèle: **Test de Hosmer-Lemeshow** (concordance entre les valeurs prédites et observées, en les divisant en classes)
+### Principe
 
-- Pouvoir discriminant du modèle:  **courbe ROC** et critère **AUC** (Area Under Curve)
+- Pour chaque observation $i$, on calcule la probabilité prédite $\widehat{P}(Y=1|x_i) = \widehat{\pi}(x_i)$.
 
+- On regroupe les observations par quantiles de distribution de la valeur prédite (*i.e.* par valeurs croissantes en $K$ groupes $G_k$  de taille égale; on prend souvent $K=10$).
 
+- Pour chaque groupe d’observations $G_k$ , on compare le nombre de sujets pour lesquels $Y=1$ ($n_{1k}$), au nombre de sujets malades prédits par le modèle ($\widehat{n}_{1k}$)
 
----
-
-## II) Calibration: 
-### Test de Howmer-Lemeshow
-
-- Pour chaque observation, on calcule la **probabilité prédite** de l’évènement $Y=1$ pour $i$ $\widehat{\pi}(x_i)$.
-
-- On regroupe les observations par **quantiles** de distribution de la valeur prédite (i.e. par valeurs croissantes en $K$ groupes $G_k$  de taille égale; on prend souvent $K=10$).
-
-- Pour chaque groupe d’observations $G_k$ , on compare le nombre de sujets pour lesquels $Y=1$ $n_{1k} = \sum_{i\in{G_k}}y_i$ au nombre de sujets malades prédits par le modèle:
-
-$$\widehat{n}_1k = \sum_{i\in{G_k}}\widehat{\pi}(x_i) =  \sum_{i\in{G_k}}\widehat{P}(Y_i = 1|xi)$$
+$$n_{1k} = \sum_{i\in{G_k}}y_i \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}\widehat{\pi}(x_i)$$
 
 
-- On fait la **même chose pour $Y=0$** en calculant $n_{0k} = \sum_{i\in{G_k}}(1-y_i)$      et $\widehat{n}_{1k} = \sum_{i\in{G_k}}\widehat{P}(Y_i = 1|xi)$
+- De même on calcule $n_{0k}$) et $\widehat{n}_{1k}$)
+
+$$n_{0k} = \sum_{i\in{G_k}} (1-y_i) \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}(1-\widehat{\pi}(x_i))$$
 
 - On compare ces valeurs observées $n_jk$ aux valeurs prédites  $\widehat{n}_jk$     (on voudrait idéalement qu’elles soient égales) par un test de $\mathcal{X}^2_{K-2}$ à $K-2$ degrés de libertés
 
@@ -222,8 +215,9 @@ Rq: il faut que pour tout $k$, $n_jk >5$ et $\widehat{n}_jk >5$ pour pouvoir app
 
 ---
 
-## II) Calibration: 
-### Example d'application
+## II)  Adéquation du modèle : Test de Howmer-Lemeshow
+
+### Exemple
 
 $$H_0 : {\widehat{n}_{1k} = n_{1k}}, \forall j,k$$	
 $$H_1 : \exists (j,k), \widehat{n}_{1k} \neq n_{1k} $$
@@ -234,7 +228,7 @@ test = ResourceSelection::hoslem.test (s, m$fitted.values)
 test
 ```
 
-La p-valeur du test de Hosmer_lemeslow est > 0.05, on consreve $H_0$ et les valeurs prédites et observées concordent bien, le modèle est bon. 
+La p-valeur du test de Hosmer-Lemeslow est > 0.05, on consreve $H_0$ et les valeurs prédites et observées concordent bien, le modèle est bon. 
 
 Définition des groupes par quantiles de probabilités prédites $\widehat{\pi}(x_i)$
 
@@ -254,42 +248,40 @@ test[[7]]
 
 ---
 
-## II) Pouvoir discriminant:  
-### La courbe ROC (1/2)
+## II)  Adéquation du modèle : courbe ROC
 
-- Le **pouvoir discriminant** correspond à la capacité du modèle à correctement classer les observation.
+### Principe
 
-- Pour chaque observation, on calcule à partir de $\widehat{\beta}$ la probabilité estimée  $\widehat{\pi}(x_i)$ pour $i$ de l’évènement $Y=1$.
+Le **pouvoir discriminant** correspond à la capacité du modèle à correctement classer les observation.
 
-- On définit pour un seuil $s \in [0,1]$ choisi:
+- Pour chaque observation $i$, on calcule la probabilité prédite $\widehat{P}(Y=1|x_i) = \widehat{\pi}(x_i)$.
+
+- On définit pour un seuil $s \in [0,1]$ choisi :
 $$ \widehat{Y}_i = \Bigg\{
 \begin{align}
-1 && si && \widehat{\pi}(x_i) \geq s \\ 
-0 && sinon
+1 && \text{si} && \widehat{\pi}(x_i) \geq s \\ 
+0 && \text{sinon}
 \end{align}
 $$
 
 - La **proportion de bien classés** correspond à :
 $$ \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\} + \# \{\widehat{Y}_i = 0, Y_i = 0\}}{n} $$
 
----
 
-## II) Pouvoir discriminant: 
-### La courbe ROC (2/2)
 
-On fait varier le seuil $s$ entre $0$ et $1$:
 
 - La **Sensibilité** correspond à la proportion de bien classées parmi les observations pour lesquelles $Y=1$, $$ sensibilité = \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\}}{\# \{Y_i = 1\}} $$
 
 
 - La **Spécificité** correspond à la proportion de bien classées parmi les oservations pour lesquelles $Y=0$, $$spécificité =  \frac{\# \{\widehat{Y}_i = 0, Y_i = 0\}}{\# \{Y_i = 0\}} $$
 
-- On cherche à **maximiser sensibilité et spécificité**.
+- On cherche à **maximiser sensibilité et spécificité** en faisant varier $s \in [0,1]$
 
 ---
 
-## II) Pouvoir discriminant: ROC
-### Exemple d'application
+## II)  Adéquation du modèle : courbe ROC
+
+### Exemple
 
 
 On recherche le seuil $s$ optimum (souvent le plus proche de $sensibilité=1$ et $spécificité=1$)
@@ -300,8 +292,7 @@ ROC = pROC::roc(response=s, m$fitted.values)
 plot(ROC, xlim=c(1,0))
 ```
 
-On recherche du point le plus proche du coin haut gauche (i.e. d’une parfaite sensitivité et spécificité)
--> ceci est obtenu pour $s=0.3593199$ (en rouge sur le graphe)
+On recherche le seuil pour lequel on maximise la sensibilité et la spécificité).
 
 
 ```{r}
@@ -314,9 +305,11 @@ points(ROC$sensitivities[wh], ROC$sensitivities[wh], col = 2, cex = 2, lwd = 2)
 
 --- 
 
-## II) Pouvoir discriminant: AUC
-##Aire Under the Curve 
+## II)  Adéquation du modèle : AUC
 
+### Principe
+
+AUC signifie "aire sous la courbe ROC". 
 
 AUC           | Discrimination
 ------------- | -------------
@@ -325,120 +318,153 @@ AUC           | Discrimination
 0.8 - 0.9     | Excellente
 > 0.9         | Exceptionnelle
 
-Plus l’air sous la courbe augmente, plus le modèle est capable de bien classer les observations:
+Plus l’aire sous la courbe augmente, plus le modèle est capable de bien classer les observations:
 
-- Si $AUC = 0.5$ alors le modèle classe de manière complètement aléeatoire les observations
+- Si $AUC = 0.5$ alors le modèle classe de manière complètement aléatoire les observations
 
 - Si $AUC > 0.9$ le modèle est très bon, voire trop bon, il faut évaluer s’il y a overfitting
  
 --- 
 
-## II) Pouvoir discriminant: AUC
-##Exemple d'application 
+## II)  Adéquation du modèle : AUC
+
+## Exemple
 
 ****TO DO ****
 
 
 ---
 
-## III) Sélection des variables d'un modèle
 
-- Critère de choix
 
-  --> Critères **AIC/BIC** (à minimiser)
+## II)  Adéquation du modèle : les résidus
+
+
+Résidus de Pearson :
+
+$$ r_{p_i} = \frac{Y_i - \widehat{\pi}_i}{\sqrt{\widehat{\pi}_i(1-\widehat{\pi}_i)}} $$
+
+Résidus de déviance : 
+
+
+$$r_{D_i} = \left  \lbrace
+\begin{array}{l}
+\sqrt(2|log(\widehat{\pi}_i)|)      \ \ \ \  \text{si}\  Y_i=1  \\
+ - \sqrt(2|log(1-\widehat{\pi}_i)|) \ \ \ \  \text{si}\  Y_i=0
+\end{array}
+\right.$$
+
+
+
+Rend compte de la contribution de chaque individu
+
+Permet de détecter les valeus extrêmes
+
+
+---
+
+## III) Sélection de variables
+
+- Critères de choix
+
+  -- Critère du $R^2$ 
   
-  --> Critère du $R^2$ (non détaillé ici car augmente de façon monotone avec l'introduction de nouvelles variables)
+  -- Critètre d’information d’Akaike (AIC)
+  
+  -- Critètre d’information bayesien (BIC)
 
 - Procédure de sélection de variable
 
---> Forward (ou pas à pas ascendante)
+-- Forward (ou pas à pas ascendante)
 
---> Backward (ou pas à pas descendante)
+-- Backward (ou pas à pas descendante)
 
---> Stepwise
+-- Stepwise
 
 ---
 
-## III) Critère de choix: Critères AIC
-### Critètre d'information d'Akaike
+## III) Sélection de variables : critères
 
-- Le critère d’information AIC s’applique aux modèles estimés par une méthode du **maximum de vraisemblance**.
+### Pseudo-$R^2$ (Cox-Snell, Nagelkerke)
 
-- Le critère AIC est défini par : 
+Augmente de façon monotone avec l’introduction de nouvelles variables 
+
+
+### Critètre d'information d'Akaike (AIC)
+
+Le critère AIC est défini par : 
 
 $$AIC = -2log(L_n(\widehat{\beta})) + 2p$$
 
-- Avec ce critère, la déviance du modèle est pénalisée par 2 fois le nombre de paramètre libre
+### Critètre d'information bayesien (BIC)
 
-- Le meilleur modèle est celui possédant **l’AIC le plus faible**.
+Le critère BIC est défini par : 
 
----
+$$BIC = -2log(L_n(\widehat{\beta})) + p \log(n)$$
 
-## III) Critère de choix: Critères BIC
-### Critètre d'information Bayésien
 
-- Le critère BIC est défini par : 
+Pour l’AIC et le BIC : 
 
-$$BIC = -2log(L_n(\widehat{\beta})) + log(p)$$
+- le critère s’applique aux modèles estimés par une méthode du **maximum de vraisemblance**
+- le meilleur modèle est celui qui minimise le critère
 
-- Le meilleur modèle est celui possédant **le BIC le plus faible**.
 
-- Il est plus parcimonieux que le critère AIC puisqu’il pénalise plus le nombre de variables présentent de le modèle.
+Le BIC est plus parcimonieux que l’AIC puisqu’il pénalise plus le nombre de variables présentent de le modèle.
 
 ---
 
-## III) Critère de choix: Comment choisir
 
-- Bien que l’efficacité de ces méthodes ne puisse être démentie par la pratique, il ne serait pas raisonnable de se fier uniquement aux résultats statistiques fournis par un
-programme informatique. En effet, pour décider d’ajouter ou de supprimer une variable dans un modèle, il faut conserver :
+## III) Sélection de variables : méthodes
 
---> une part d’intuition
+Méthodes les plus classiques:
 
---> une part de déduction
+- Forward (ou pas à pas ascendante)
 
---> une part de synthèse.
+- Backward (ou pas à pas descendante)
 
----
+- Stepwise
 
-## III) Procédure de séletion de variable
+Ces méthodes s’appuient sur les **données recueillies**
 
-- Méthodes les plus classiques:
+Elles sont **itératives**
 
---> Forward (ou pas à pas ascendante)
+Elle dépendent de **paramètres** (à valeur prédéfinie)
 
---> Backward (ou pas à pas descendante)
+Bien que l’efficacité de ces méthodes ne puisse être démentie par la pratique, il ne serait pas raisonnable de se fier uniquement aux résultats statistiques fournis par un
+algorithme. En effet, pour décider d’ajouter ou de supprimer une variable dans un modèle, il faut conserver :
 
---> Stepwise
+- une part d’intuition
 
-- Ces méthodes s’appuient sur les **données recueillies**
+- une part de déduction
 
-- Elles sont **itératives**
+- une part de synthèse
 
-- Elle dépendent de **paramètres** (à valeur prédéfinie)
 
 ---
 
-## III) Procédure de séletion de variable
-### Forward (ou pas à pas ascendante)
+## III) Sélection de variables : forward
 
-1) On part du modèle le plus **simple**:
+### Principe
+
+1) On part du modèle le plus **simple** :
 
 - Modèle vide (avec uniquement la constante)
 
 - Ou modèle avec les variables d’ajustement
 
-2) On **ajoute une à une** les variables:
+2) On **ajoute une à une** les variables :
 
 - En se basant sur le test de rapport de vraisemblance
 
 - En ajoutant à chaque pas, parmi les variables restantes, celle qui est la plus significative (selon un critère donné)
 
-3) On **s’arrête quand il n’y a plus de variables «à ajouter»** (selon un critère prédéfini, eg. valeur minimale de p-valeur du test, en général 0.10)
+3) On **s’arrête quand il n’y a plus de variables à ajouter** (selon un critère prédéfini, eg. valeur minimale de p-valeur du test, en général 0.10)
 
 ---
 
-## III) Procédure de séletion de variable : 
-### Forward, Exemple d'application
+## III) Sélection de variables : forward
+
+### Exemple
 
 ```{r}
 m0 = glm(s~d$poids, family = binomial(logit))
@@ -447,8 +473,9 @@ step(m0, scope = "~d$poids+d$taille+d$age", dir = "forward")
 
 ---
 
-## III) Procédure de séletion de variable
-### Backward (ou pas à pas descendante)
+## III) Sélection de variables : backward
+
+### Principe
 
 1) On part du modèle **le plus complexe**, i.e. avec toutes les variables incluses
 
@@ -462,8 +489,9 @@ step(m0, scope = "~d$poids+d$taille+d$age", dir = "forward")
 
 ---
 
-## III) Procédure de séletion de variable : 
-### Backward, Exemple d'application
+## III) Sélection de variables : backward
+
+### Exemple
 
 ```{r}
 mc = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
@@ -471,9 +499,9 @@ step(mc, dir = "backward")
 ```
 
 ---
+## III) Sélection de variables : stepwise
 
-## III) Procédure de séletion de variable
-### Stepwise 
+### Principe
 
 1) On part d’un **modèle donné**.
 
@@ -487,8 +515,9 @@ step(mc, dir = "backward")
 
 ---
 
-## III) Procédure de séletion de variable : 
-### Stepwise, Exemple d'application
+## III) Sélection de variables : stepwise
+
+### Exemple
 
 ```{r}
 m0 = glm(s~d$poids, family = binomial(logit))
@@ -497,7 +526,8 @@ step(mc, scope = "~d$poids+d$taille+d$age", dir = "both")
 ---
 
 ## III) Procédure de séletion de variable
-### Comment choisir?
+
+### Comment choisir ?
 
 1) On partira plutôt:
 
@@ -507,26 +537,4 @@ step(mc, scope = "~d$poids+d$taille+d$age", dir = "both")
 
 2) La procédure stepwise est souvent privilégiée car plus souple (i.e. en «tâtonnant», plus de chances de tomber sur le bon modèle), bien qu’elle soit plus lourde (i.e. plus de variables testées à chaque pas, donc plus long temps de calcul).
 
-
----
-
-## Evaluation
-
-### Sujet
-
-On s'intéresse à la méthylation de l'ADN sur différents tissus humains (187 échantillons). Pour certains échantillons, le genre est manquant. Utilisez les valeurs de méthylation pour **imputer le sexe** des échantillons lorsqu'il n'est pas connu.
-
-Veuillez restituer votre travail sous le format d'un PDF de deux pages (graphiques compris) en décrivant la méthode que vous avez choisie, en expliquant les choix que vous avez effectués et en analysant vos résultats. 
-
-Ce travail est à renvoyer par e-mail avant le *mardi 27 novembre 2018 (minuit)* à :
-
-- magali.richard@univ-grenoble-alpes.fr & florent.chuffart@univ-grenoble-alpes.fr 
-
- Le sujet (avec les données et un exemple) est disponible [ici](sujet_controle_continu.pdf)
- 
----
-
-## Mise en pratique
-
-Quelques exercices à réaliser sous R disponibles [ici](TD.pdf)
 
