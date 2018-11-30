@@ -30,6 +30,20 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ---
 
+## Données : data_nutri
+
+```{r}
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
+DT::datatable(d, width = "100%")
+# head(d)
+s = as.numeric(d$sex) - 1
+
+```
+
+
+---
+
 # Plan
 
 I) Rappel : Modèle, OR, RR et test de significativité
@@ -383,7 +397,7 @@ Permet de détecter les valeus extrêmes
 
 ---
 
-## III) Sélection de variables : critères
+## III) Sélection de variables : c  ritères
 
 ### Pseudo-$R^2$ (Cox-Snell, Nagelkerke)
 
@@ -499,6 +513,7 @@ step(mc, dir = "backward")
 ```
 
 ---
+
 ## III) Sélection de variables : stepwise
 
 ### Principe
