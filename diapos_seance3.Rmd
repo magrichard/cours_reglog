@@ -30,6 +30,20 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ---
 
+## Données : data_nutri
+
+```{r}
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
+DT::datatable(d, width = "100%")
+# head(d)
+s = as.numeric(d$sex) - 1
+
+```
+
+
+---
+
 # Plan
 
 I) Rappel : Modèle, OR, RR et test de significativité
@@ -208,7 +222,7 @@ Mesurer l’**adéquation** du modèle **aux données** c’est étudier essenti
 $$n_{1k} = \sum_{i\in{G_k}}y_i \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}\widehat{\pi}(x_i)$$
 
 
-- De même on calcule $n_{0k}$) et $\widehat{n}_{1k}$)
+- De même on calcule $n_{0k}$ et $\widehat{n}_{0k}$
 
 $$n_{0k} = \sum_{i\in{G_k}} (1-y_i) \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}(1-\widehat{\pi}(x_i))$$
 
@@ -255,7 +269,7 @@ test[[7]]
 
 ### Principe
 
-Le **pouvoir discriminant** correspond à la capacité du modèle à correctement classer les observation.
+Le **pouvoir discriminant** correspond à la capacité du modèle à correctement classer les observations.
 
 - Pour chaque observation $i$, on calcule la probabilité prédite $\widehat{P}(Y=1|x_i) = \widehat{\pi}(x_i)$.
 
@@ -333,7 +347,18 @@ Plus l’aire sous la courbe augmente, plus le modèle est capable de bien class
 
 ## Exemple
 
-****TO DO ****
+```{r}
+m1 = glm(s~d$poids, family = binomial(logit))
+m2 = glm(s~d$taille, family = binomial(logit))
+m3 = glm(s~d$taille+d$poids, family = binomial(logit))
+ROC1 = pROC::roc(response=s, m1$fitted.values)
+ROC2 = pROC::roc(response=s, m2$fitted.values)
+ROC3 = pROC::roc(response=s, m3$fitted.values)
+plot(ROC1, xlim=c(1,0), col=2)
+lines(ROC2, xlim=c(1,0), col=4)
+lines(ROC3, xlim=c(1,0), col="grey")
+legend("bottomright", lty=1, c("s~poids", "s~taille", "s~taille+poids"), col=c("2", "4", "grey"))
+```
 
 
 ---
@@ -386,7 +411,7 @@ Permet de détecter les valeus extrêmes
 
 ---
 
-## III) Sélection de variables : critères
+## III) Sélection de variables : c  ritères
 
 ### Pseudo-$R^2$ (Cox-Snell, Nagelkerke)
 
@@ -502,6 +527,7 @@ step(mc, dir = "backward")
 ```
 
 ---
+
 ## III) Sélection de variables : stepwise
 
 ### Principe
