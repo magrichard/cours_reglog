@@ -308,7 +308,8 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 </ul>
 <p>Exemple: l’âge</p>
 <p>Cette variable d’intérêt est de nature continue. Elle peut représenter synthétiquement beaucoup de notions complexes: le vieillissement biologique, l’exposition cumulée à des polluants, le risque de maladie spécifique à certaines tranches d’âges…</p>
-<p>La variable aléatoire âge est mesurée en jours/mois/années. Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: &lt;35 ans, 35-45 ans, 45-55 ans, &gt;55 ans)</p>
+<p>La variable aléatoire âge est mesurée en jours/mois/années. Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue.</p>
+<p>On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: &lt;35 ans, 35-45 ans, 45-55 ans, &gt;55 ans)</p>
 </div>
 <div class="slide section level1">
 
@@ -316,9 +317,9 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 <h3 id="encodage-des-variables">Encodage des variables</h3>
 <h4 id="codage">Codage</h4>
 <ul>
-<li>Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens » en lien avec nos à priori biologiques, par observation des données, tests, etc.)</li>
+<li><p>Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens» en lien avec nos à priori biologiques, par observation des données, tests, etc.)</p></li>
+<li><p>Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte</p></li>
 </ul>
-<p>-Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte</p>
 <h4 id="transformation">Transformation</h4>
 <ul>
 <li><p>Toute variable peut être <strong>transformée</strong> avant de l’inclure dans un modèle, eg. Passée au logarithme, à l’exponentiel, catégorisée pour une variable continue Regrouper les catégories pour une variable catégorielle</p></li>
@@ -340,12 +341,10 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 <h3 id="resume">Résumé</h3>
 <p>Procédure communément utilisée de sélection de modèle:</p>
 <ol style="list-style-type: decimal">
-<li>Effectuer une première sélection par des tests univariés (au risque de 0.05, 0.10 ou 0.20) surtout quand on a un grand nombre de variables d’ exposition</li>
-</ol>
-<p>2)A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)</p>
-<p>3)Tester les interactions entre variables du modèle multivarié retenu</p>
-<ol start="4" style="list-style-type: decimal">
-<li>Au final, ne retenir que les variables significatives simultanément. Retenir les effets principaux quand on retient une interaction.</li>
+<li><p>Effectuer une première sélection par des tests univariés (au risque de 0.05, 0.10 ou 0.20) surtout quand on a un grand nombre de variables d’ exposition</p></li>
+<li><p>A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)</p></li>
+<li><p>Tester les interactions entre variables du modèle multivarié retenu</p></li>
+<li><p>Au final, ne retenir que les variables significatives simultanément. Retenir les effets principaux quand on retient une interaction.</p></li>
 </ol>
 </div>
 <div id="plan-2" class="slide section level1">
@@ -476,7 +475,8 @@ pi.hat<span class="op">$</span>fit</code></pre></div>
 ## No Hauck-Donner effect found in any of the estimates
 ## 
 ## Reference group is level  6  of the response</code></pre>
-<p>$ln () = _kX $ correspond aux prédicteurs linéaire: <code>log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])</code></p>
+<p><span class="math inline">\(ln \Big(\frac{P(Y=k|X)}{P(Y=u|X)}\Big) = \beta_kX\)</span> correspond aux prédicteurs linéaires:</p>
+<p><code>log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])</code></p>
 </div>
 <div class="slide section level1">
 
