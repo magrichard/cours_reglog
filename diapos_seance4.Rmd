@@ -244,7 +244,7 @@ Rq:
 ```{r}
 d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
 d$sex = as.factor(d$sex)
-DT::datatable(d, width = "100%")
+#DT::datatable(d, width = "100%")
 s = as.numeric(d$sex) - 1
 ```
 
@@ -284,7 +284,7 @@ OR_mod2_the
  
 (3) Interprétation
 
-Si **différence* entre cas 1 et cas 2:
+Si **différence** entre cas 1 et cas 2:
 
    - Facteur de confusion (différence majeure)
    
@@ -469,3 +469,13 @@ summary(m)
 
 $ln \Big(\frac{P(Y=k|X)}{P(Y=u|X)}\Big) = \beta_kX $ correspond aux prédicteurs linéaire:
 `log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])`
+
+---
+
+## Mise en pratique
+
+Quelques exercices à réaliser sous R disponibles:
+
+- [TP2](TP2_reglog_M2.pdf)
+
+- [TP3](TP3_reglog_M2.pdf)
