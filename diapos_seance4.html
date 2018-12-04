@@ -308,7 +308,8 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 </ul>
 <p>Exemple: l’âge</p>
 <p>Cette variable d’intérêt est de nature continue. Elle peut représenter synthétiquement beaucoup de notions complexes: le vieillissement biologique, l’exposition cumulée à des polluants, le risque de maladie spécifique à certaines tranches d’âges…</p>
-<p>La variable aléatoire âge est mesurée en jours/mois/années. Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: &lt;35 ans, 35-45 ans, 45-55 ans, &gt;55 ans)</p>
+<p>La variable aléatoire âge est mesurée en jours/mois/années. Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue.</p>
+<p>On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: &lt;35 ans, 35-45 ans, 45-55 ans, &gt;55 ans)</p>
 </div>
 <div class="slide section level1">
 
@@ -316,9 +317,9 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 <h3 id="encodage-des-variables">Encodage des variables</h3>
 <h4 id="codage">Codage</h4>
 <ul>
-<li>Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens » en lien avec nos à priori biologiques, par observation des données, tests, etc.)</li>
+<li><p>Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens» en lien avec nos à priori biologiques, par observation des données, tests, etc.)</p></li>
+<li><p>Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte</p></li>
 </ul>
-<p>-Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte</p>
 <h4 id="transformation">Transformation</h4>
 <ul>
 <li><p>Toute variable peut être <strong>transformée</strong> avant de l’inclure dans un modèle, eg. Passée au logarithme, à l’exponentiel, catégorisée pour une variable continue Regrouper les catégories pour une variable catégorielle</p></li>
@@ -340,12 +341,10 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 <h3 id="resume">Résumé</h3>
 <p>Procédure communément utilisée de sélection de modèle:</p>
 <ol style="list-style-type: decimal">
-<li>Effectuer une première sélection par des tests univariés (au risque de 0.05, 0.10 ou 0.20) surtout quand on a un grand nombre de variables d’ exposition</li>
-</ol>
-<p>2)A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)</p>
-<p>3)Tester les interactions entre variables du modèle multivarié retenu</p>
-<ol start="4" style="list-style-type: decimal">
-<li>Au final, ne retenir que les variables significatives simultanément. Retenir les effets principaux quand on retient une interaction.</li>
+<li><p>Effectuer une première sélection par des tests univariés (au risque de 0.05, 0.10 ou 0.20) surtout quand on a un grand nombre de variables d’ exposition</p></li>
+<li><p>A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)</p></li>
+<li><p>Tester les interactions entre variables du modèle multivarié retenu</p></li>
+<li><p>Au final, ne retenir que les variables significatives simultanément. Retenir les effets principaux quand on retient une interaction.</p></li>
 </ol>
 </div>
 <div id="plan-2" class="slide section level1">
@@ -378,16 +377,21 @@ OR_mod2_the =<span class="st"> </span><span class="kw">exp</span>(<span class="k
 <h3 id="exemple-dapplication">Exemple d’application</h3>
 <p>Prediction de <span class="math inline">\(logit(\pi(X)) = \widehat \beta x_i\)</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m=<span class="st"> </span><span class="kw">glm</span>(s<span class="op">~</span>taille<span class="op">+</span>poids, d,<span class="dt">family =</span> <span class="kw">binomial</span>(logit))
-pi.hat =<span class="st"> </span><span class="kw">predict</span>(m,<span class="dt">newdata =</span> <span class="kw">data.frame</span>(<span class="dt">taille =</span> <span class="dv">168</span>, <span class="dt">poids =</span> <span class="dv">75</span>), <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>)
-pi.hat<span class="op">$</span>fit</code></pre></div>
+logit.pi.hat =<span class="st"> </span><span class="kw">predict</span>(m,<span class="dt">newdata =</span> <span class="kw">data.frame</span>(<span class="dt">taille =</span> <span class="dv">168</span>, <span class="dt">poids =</span> <span class="dv">75</span>), <span class="dt">se.fit =</span> <span class="ot">TRUE</span>)
+logit.pi.hat<span class="op">$</span>fit</code></pre></div>
+<pre><code>##         1 
+## 0.8950255</code></pre>
+<p>Prediction de <span class="math inline">\(\widehat \pi(X) = \frac{e^{\widehat\beta x_i}}{1 + e^{\widehat\beta x_i}}\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pi.hat =<span class="st"> </span><span class="kw">exp</span>(logit.pi.hat<span class="op">$</span>fit)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(logit.pi.hat<span class="op">$</span>fit))
+pi.hat.resp =<span class="st"> </span><span class="kw">predict.glm</span>(m,<span class="dt">newdata =</span> <span class="kw">data.frame</span>(<span class="dt">taille =</span> <span class="dv">168</span>, <span class="dt">poids =</span> <span class="dv">75</span>), <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>)
+pi.hat</code></pre></div>
 <pre><code>##         1 
 ## 0.7099262</code></pre>
-<p>Prediction de <span class="math inline">\(\widehat \pi(X) = \frac{e^{\widehat\beta x_i}}{1 + e^{\widehat\beta x_i}}\)</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(pi.hat<span class="op">$</span>fit)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(pi.hat<span class="op">$</span>fit))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pi.hat.resp<span class="op">$</span>fit</code></pre></div>
 <pre><code>##         1 
-## 0.6703848</code></pre>
+## 0.7099262</code></pre>
 <p>Predication de l’interval de confiance <span class="math inline">\(IC_{95}(\widehat \pi(X))\)</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ci =<span class="st"> </span><span class="kw">c</span>(pi.hat<span class="op">$</span>fit <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span><span class="op">*</span>pi.hat<span class="op">$</span>se.fit, pi.hat<span class="op">$</span>fit <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span><span class="op">*</span>pi.hat<span class="op">$</span>se.fit)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ci =<span class="st"> </span><span class="kw">c</span>(pi.hat.resp<span class="op">$</span>fit <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span><span class="op">*</span>pi.hat.resp<span class="op">$</span>se.fit, pi.hat.resp<span class="op">$</span>fit<span class="op">+</span><span class="st"> </span><span class="fl">1.96</span><span class="op">*</span>pi.hat.resp<span class="op">$</span>se.fit)
 <span class="kw">exp</span>(ci)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(ci))</code></pre></div>
 <pre><code>##         1         1 
 ## 0.6437033 0.6960119</code></pre>
@@ -476,7 +480,8 @@ pi.hat<span class="op">$</span>fit</code></pre></div>
 ## No Hauck-Donner effect found in any of the estimates
 ## 
 ## Reference group is level  6  of the response</code></pre>
-<p>$ln () = _kX $ correspond aux prédicteurs linéaire: <code>log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])</code></p>
+<p><span class="math inline">\(ln \Big(\frac{P(Y=k|X)}{P(Y=u|X)}\Big) = \beta_kX\)</span> correspond aux prédicteurs linéaires:</p>
+<p><code>log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])</code></p>
 </div>
 <div class="slide section level1">
 

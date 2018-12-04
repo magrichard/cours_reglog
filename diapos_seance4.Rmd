@@ -313,7 +313,9 @@ Exemple: l’âge
 
 Cette variable d’intérêt est de nature continue. Elle peut représenter synthétiquement beaucoup de notions complexes: le vieillissement biologique, l’exposition cumulée à des polluants, le risque de maladie spécifique à certaines tranches d’âges…
 
-La variable aléatoire âge est mesurée en jours/mois/années. Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue
+La variable aléatoire âge est mesurée en jours/mois/années. 
+Théoriquement, c’est donc une variable discrète (i.e. nombre limité de valeurs possibles, eg. sur une population d’enfant avec âge en années), mais on le considère souvent comme de nature continue.
+
 On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: <35 ans, 35-45 ans, 45-55 ans, >55 ans) 
 
 ---
@@ -323,9 +325,9 @@ On peut aussi le catégoriser/coder en tranches d’âges (ex. de codage: <35 an
 
 #### Codage
 
-- Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens » en lien avec nos à priori biologiques, par observation des données, tests, etc.)
+- Eviter de faire des hypothèses arbitraires sur la relation variable explicative- variable expliquée (chercher dans la littérature, par « bon sens» en lien avec nos à priori biologiques, par observation des données, tests, etc.)
 
--Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte 
+- Prendre en compte dans un modèle une variable mal codée peut s’avérer pire que de ne pas la prendre en compte 
 
 #### Transformation 
 
@@ -357,9 +359,9 @@ Procédure communément utilisée de sélection de modèle:
 
 1) Effectuer une première sélection par des tests univariés (au risque de 0.05, 0.10 ou 0.20) surtout quand on a un grand nombre de variables d’ exposition
 
-2)A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)
+2) A partir de cette première sélection, chercher le modèle multivarié approprié (plusieurs procédures pas a pas peuvent etre testées)
 
-3)Tester les interactions entre variables du modèle multivarié retenu
+3) Tester les interactions entre variables du modèle multivarié retenu
 
 4) Au final, ne retenir que les variables significatives simultanément. Retenir les effets principaux quand on retient une interaction.
 
@@ -404,21 +406,24 @@ Prediction de $logit(\pi(X)) =  \widehat \beta x_i$
 
 ```{r}
 m= glm(s~taille+poids, d,family = binomial(logit))
-pi.hat = predict(m,newdata = data.frame(taille = 168, poids = 75), type = "response", se.fit = TRUE)
-pi.hat$fit
+logit.pi.hat = predict(m,newdata = data.frame(taille = 168, poids = 75), se.fit = TRUE)
+logit.pi.hat$fit
 
 ```
 
 Prediction de $\widehat \pi(X) =  \frac{e^{\widehat\beta x_i}}{1 + e^{\widehat\beta x_i}}$
 
 ```{r}
-exp(pi.hat$fit)/(1+exp(pi.hat$fit))
+pi.hat = exp(logit.pi.hat$fit)/(1+exp(logit.pi.hat$fit))
+pi.hat.resp = predict.glm(m,newdata = data.frame(taille = 168, poids = 75), type = "response", se.fit = TRUE)
+pi.hat
+pi.hat.resp$fit
 ```
 
 Predication de l'interval de confiance $IC_{95}(\widehat \pi(X))$
 
 ```{r}
-ci = c(pi.hat$fit - 1.96*pi.hat$se.fit, pi.hat$fit + 1.96*pi.hat$se.fit)
+ci = c(pi.hat.resp$fit - 1.96*pi.hat.resp$se.fit, pi.hat.resp$fit+ 1.96*pi.hat.resp$se.fit)
 exp(ci)/(1+exp(ci))
 ```
 
@@ -467,7 +472,8 @@ summary(m)
 
 ```
 
-$ln \Big(\frac{P(Y=k|X)}{P(Y=u|X)}\Big) = \beta_kX $ correspond aux prédicteurs linéaire:
+$ln \Big(\frac{P(Y=k|X)}{P(Y=u|X)}\Big) = \beta_kX$ correspond aux prédicteurs linéaires:
+
 `log(mu[,1]/mu[,6]), log(mu[,2]/mu[,6]), log(mu[,3]/mu[,6]), log(mu[,4]/mu[,6]), log(mu[,5]/mu[,6])`
 
 ---
