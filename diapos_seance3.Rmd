@@ -97,7 +97,10 @@ On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
 
 
 ```{r}
-
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
+DT::datatable(d, width = "100%")
+s = as.numeric(d$sex) - 1
 layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
