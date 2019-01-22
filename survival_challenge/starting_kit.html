@@ -260,10 +260,10 @@ div.tocify {
 </div>
 <div id="how-do-i-get-information" class="section level2">
 <h2><span class="header-section-number">1.4</span> How do I get information?</h2>
-<p>Section 2 indicates where to find information about metadata.</p>
-<p>Section 3 and 4 explain how to load the data and how to identify the patients.</p>
+<p>Section 2 indicates where the data are coming from.</p>
+<p>Section 3 and 4 explain how to load the data , what are the data, and how to identify the patients.</p>
 <p>Section 5 and 6 display exemples of data exploration.</p>
-<p>Please go to section 7 to see an exemple of result submission on the platform.</p>
+<p>Please go to section 7 to see an exemple of result submission on the cadalab platform.</p>
 </div>
 <div id="what-will-be-the-evaluation" class="section level2">
 <h2><span class="header-section-number">1.5</span> What will be the evaluation?</h2>
@@ -274,14 +274,23 @@ div.tocify {
 <div id="references" class="section level1">
 <h1><span class="header-section-number">2</span> References</h1>
 <pre><code>## Loading required package: survival</code></pre>
-<p>TCGA Study Abbreviations:</p>
+<p>Data are coming from the TCGA (The cancer genome atlas). They were extracted from severla cohorts of patients. Here are TCGA Study Abbreviations corresponding to each cancer:</p>
 <p><a href="https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations" class="uri">https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations</a></p>
 </div>
 <div id="loading-data" class="section level1">
 <h1><span class="header-section-number">3</span> Loading data</h1>
+<p><code>exp_grp</code> corresponds to metadata associated with the patients (2049 patients).</p>
+<p><code>data</code> corresponds to gene expression data for each pations patients (9466 genes).</p>
+<p><code>pf</code> corresponds to informations related to each gene.</p>
 <pre class="r"><code>exp_grp = readRDS(file=&quot;challenge_ssd2019_e.rds&quot;)
+head(exp_grp)
+dim(exp_grp)
 data    = readRDS(file=&quot;challenge_ssd2019_d.rds&quot;)
-pf      = readRDS(file=&quot;challenge_ssd2019_p.rds&quot;)</code></pre>
+head(data)
+dim(data)
+pf      = readRDS(file=&quot;challenge_ssd2019_p.rds&quot;)
+head(pf)
+dim(pf)</code></pre>
 </div>
 <div id="tumoral-and-non-tumoral-samples" class="section level1">
 <h1><span class="header-section-number">4</span> Tumoral and non tumoral samples</h1>

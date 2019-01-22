@@ -52,13 +52,13 @@ Use the training set ('training' id in `exp_grp$sets`) to determine your best cl
   
 ## How do I get information?
   
-Section 2 indicates where to find information about metadata.
+Section 2 indicates where the data are coming from.
 
-Section 3 and 4 explain how to load the data and how to identify the patients.
+Section 3 and 4 explain how to load the data , what are the data, and how to identify the patients.
 
 Section 5 and 6 display exemples of data exploration.
 
-Please go to section 7 to see an exemple of result submission on the platform.
+Please go to section 7 to see an exemple of result submission on the cadalab platform.
 
 ## What will be the evaluation?
 
@@ -149,7 +149,7 @@ coxres = function (ss, v)
 }
 ```
 
-TCGA Study Abbreviations:
+Data are coming from the TCGA (The cancer genome atlas). They were extracted from severla cohorts of patients. Here are TCGA Study Abbreviations corresponding to each cancer:
 
 https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations
 
@@ -157,10 +157,22 @@ https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbrevia
 
 # Loading data
 
+`exp_grp` corresponds to metadata associated with the patients (2049 patients).
+
+`data` corresponds to gene expression data for each pations patients (9466 genes).
+
+`pf` corresponds to informations related to each gene.
+
 ```{r}
 exp_grp = readRDS(file="challenge_ssd2019_e.rds")
+head(exp_grp)
+dim(exp_grp)
 data    = readRDS(file="challenge_ssd2019_d.rds")
+head(data)
+dim(data)
 pf      = readRDS(file="challenge_ssd2019_p.rds")
+head(pf)
+dim(pf)
 ```
 
 # Tumoral and non tumoral samples 
