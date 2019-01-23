@@ -48,7 +48,7 @@ Use the training set ('training' id in `exp_grp$sets`) to determine your best cl
 **Warning**  
 
   - You have only **one** opportunity to submit to Challenge 2, to avoid over fitting.
-  - The Challenge 2 will be opened from 5pm to 6pm. 
+  - The Challenge 2 will be opened from 5pm to 8pm. 
   
 ## How do I get information?
   
@@ -62,7 +62,7 @@ Please go to section 7 to see an exemple of result submission on the cadalab pla
 
 ## What will be the evaluation?
 
-At 6 pm, you will have to return a report of 10 pages maximum including an introduction, the methods you used, and a discussion of the results obtained.
+At 8pm, you will have to return a report of 5 pages maximum including an introduction, the methods you used, and a discussion of the results obtained.
 
 You will be evaluated on the quality of your classification (results submission on the codalab paltform), your creativity to achieve this goal and the clarity of your report.
 
@@ -279,7 +279,7 @@ The zip files have to be submit on the coda lab interface > Participate > Submit
 Warning:  
 
   - You have only **one** opportunity to submit to Challenge 2, to avoid over fitting.
-  - The Challenge 2 is only reachable after 5PM.
+  - The Challenge 2 is only reachable after 5pm.
    
 
 ## Challenge 1
