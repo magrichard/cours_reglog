@@ -2,7 +2,7 @@
 title: "Régression Logistique"
 subtitle: "Séance 1"
 author: "Florent Chuffart & Magali Richard (d'après le cours de Lydiane Agier)"
-date: "13 Novembre 2018"
+date: "`r Sys.Date()`"
 output: slidy_presentation
 ---
 
@@ -13,19 +13,34 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ---
 
-## Evaluation
+## Cours 
 
- - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique" 
- - data challenge à la fin des séances "Régression Logistique" et "Survie" (23 janvier 2019)
+- https://github.com/magrichard/cours_reglog
+
 
 ## Pré-requis
  
  - R https://cran.r-project.org 
  - RStudio https://www.rstudio.com
 
-## Cours 
 
-- https://github.com/magrichard/cours_reglog
+## Evaluation
+
+ - individuelle : 
+ 
+     - mini questionnaire à la fin de chaque séance
+
+     - *data challenge* à la maison aprés les 2 premières séances de "Régression Logistique" 
+
+ - en équipe : *data challenge* en 12h à la fin des séances "Régression Logistique" et "Survie" (10 janvier 2019)
+
+
+## 3 Data Challenges
+ 
+ - *sexpred* : prédir le sexe de 100 patients à partir de 500 observations 
+ - *histpred* : prédir l’histologie de 100 patients à partir de 500 observations
+ - *virpred* : prédir la virulence  de 100 patients à partir de 500 observations
+
 
 ---
 
@@ -35,6 +50,8 @@ I) Rappel (régression linéaire)
 II) Introduction à la regression logistique
 III) Formalisme et principe (modèle logit)
 IV) Estimation des coefficients beta
+v) Test de significativité
+
 
 ---
 
@@ -147,6 +164,9 @@ Exemple de variable à expliquer :
   - Survenue de cancer en fonction d’expositions chimiques
   - Consommation d’un bien selon variables sociodémographiques
   - Risque d’accoucher d’un bébé de faible poids (<2500g) en fonction de l’âge de la mère, du poids, du tabagisme.
+  - le sexe en fonction de l’expression des gènes (challenge *sexpred*)
+  - l’histoplogie en fonction de l’expression des gènes (challenge *histpred*)
+  - la survie à 24 mois en fonction de l’expression des gènes (challenge *virpred*)
 
 ---
 
@@ -195,15 +215,23 @@ $$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$
 
 ### Fonction logit
 
-La fonction *logit* est définie de $[0,1]$ dans $R$ par:
-$$	logit:[0,1]	\rightarrow	R $$
-$$	x	\rightarrow	logit(x) = log(\frac{x}{1-x}) $$
+
+\begin{eqnarray}
+              \text{logit: } ]0,1[ & \rightarrow & \mathbb{R} \\
+                                 x & \rightarrow & logit(x)  =  log(\frac{x}{1-x}) \\ 
+\end{eqnarray}
+
 $$ \lim_{x\to0} logit(x) = -\infty $$
 $$ \lim_{x\to1} logit(x) = +\infty $$
 
 La fonction *logit* s’inverse :
-$$	logit^{-1}: R 	\rightarrow	[0,1] $$
-$$	x	\rightarrow	logit^{-1}(x) = \frac{1}{1 + e^{-x}} $$
+
+
+\begin{eqnarray}
+              \text{logit: } \mathbb{R}& \rightarrow &  ]0,1[  \\
+                      y & \rightarrow & logit^{-1}(y) = \frac{1}{1+e^{-y}}  
+\end{eqnarray}
+
 
 
 
@@ -239,7 +267,11 @@ On utilise donc le modèle logistique:
     $$logit(\pi (X))= \beta X$$ 
     $$\pi (X)= logit^{-1}(\beta X)$$ 
 
+
+On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
+
 Comme en régression linéaire, l’objet de cette modélisation est *d’estimer les coefficients $\beta$*
+
 
 
 ---
@@ -279,7 +311,7 @@ legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
 
 - On note les covariables globales théoriques: $X=(X_1,...,X_p)$ et observées : $x=(x_1,...,x_p)$. Les covariables individuelles observées sont notées : $x_i=(x_{1i},...,x_{pi})$
 
-- Le modèle conditionnel de $Y$ sachant $X$ est: $E(Y|X = x) \sim B(\pi(x))$
+- Le modèle conditionnel de $Y$ sachant $X$ est : $E(Y|X = x) \sim B(\pi(x))$
 
 - Pour l’observation $i$, la contribution à la vraisemblance est donc:
 $$l(x_i, y_i) = P(y_i = 1|x_i)^{y_i} (1-P(y_i=1|x_i))^{1-y_i} = \pi(x_i)^{y_i}(1-\pi(x_i))^{1-y_i} $$
@@ -364,7 +396,7 @@ i.e. la probabilité estimée de $Y=1$ pour chaque individu en fonction de ses c
 
 2) les **résidus** : $\epsilon = Y - \widehat{\pi}(X)$
 
-Ceux-ci peuvent servir à estimer l‘adéquation du modèle aux données (vus plus loin)
+Ceux-ci peuvent servir à estimer l’adéquation du modèle aux données (vus plus loin)
 
 
 
@@ -434,3 +466,135 @@ legend("bottomright","P(Y|X)", col=4, lty=1, cex=0.6)
 
 
 ```
+
+
+
+
+---
+
+## V) Test de significativité des paramètres 
+
+- On veut tester l’influence de $X_k$. On teste: $$H_0 : {\beta_k = 0}$$	vs. $$H_1 : {\beta_k \neq 0}$$
+
+- Il existe 3 tests:
+1) Test de Wald
+2) Test du score (peu utilisé, pas vu ici)
+3) Test du rapport de vraisemblance (pour modèles emboités)
+
+---
+
+## V) Test de Wald 
+
+$$ \sqrt{n\Sigma^{1/2}}(\widehat{\beta}-\beta) \rightarrow \mathcal{N}(0,I_p) $$
+$$ T =n(\widehat\beta-\beta)'\widehat\Sigma^{-1}(\widehat\beta-\beta) \xrightarrow[]{L} \mathcal{X}^2_p $$
+avec $n$ le nombre d'observations et $p$ le nombre de paramètres testés.
+
+Rq, pour un unique paramètre on a $T = \Big(\frac {\widehat\beta_k} {\widehat\sigma_{\widehat\beta_k}}\Big)^2 \sim \mathcal{X}^2_p$
+
+- On rejette $H_0$ si: 
+$$T>z^p_{1-\alpha}$$
+avec $z^p_{1-\alpha}$ le quantile de niveau $(1-\alpha)$ de la loi de $\mathcal{X}^2$ à $p$ ddl.
+
+---
+
+## V) Exemple Test de Wald
+
+```{r}
+m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+m$coefficients
+summary(m)$coefficient
+```
+
+```{r}
+#Wald test for weight effect
+summary(m)$coefficient[2,4]
+#Wald test for size effect
+summary(m)$coefficient[3,4]
+#Wald test for age effect
+summary(m)$coefficient[4,4]
+```
+
+```{r, eval=FALSE}
+library(aod)
+varEst = summary(m1)$cov.unscaled
+Est = summary(m1)$coefficient[,1]
+Est
+#wald test for age
+wald.test(Sigma = varEst, b = Est , Terms = 4)
+```
+
+---
+
+## V) Test du rapport de vraisemblance
+
+Soit mod1 un modèle emboité dans mod2 (i.e. toutes les variables dans mod1 sont dans mod2) avec mod2 qui comprend $p$ variables explicatives supplémentaires par rapport à mod1 avec:
+
+$L1$ la valeur de vraisemblance de mod1 et $L2$ la valeur de vraisemblance de mod2. On a:
+
+$$ T = -2[log(L_1) - log(L_2)] \rightarrow \mathcal{X}^2_p$$
+Rq: On appelle $D= - 2 log(L1))$ la déviance pour mod1
+
+*!! Il faut que ces modèles soient appliquées aux même observations (entre autres, pas de données manquantes)*
+
+- On rejette $H_0$ si: 
+$$T>z^p_{1-\alpha}$$
+avec $z^p_{1-\alpha}$ le quantile de niveau $(1-\alpha)$ de la loi de $\mathcal{X}^2$ à $p$ ddl.
+
+*!! Il faut que l’ajout des $p$ variables apportent suffisamment au modèle pour être considérées «utiles»*
+
+---
+
+## V) Exemple Test du rapport de vraisemblance
+
+$H_0 : {\beta_{age} = 0}$	vs. $H_1 : {\beta_{age} \neq 0}$
+
+```{r}
+m1 = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+m2 = glm(s~d$poids+d$taille, family = binomial(logit))
+anova(m2, m1, test="Chisq")
+```
+
+$H_0 : {(\beta_{poids}, \beta_{age}) = (0,0)}$	vs. $H_1 :{(\beta_{poids}, \beta_{age}) \neq (0,0)}$
+
+```{r}
+m1 = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+m2 = glm(s~d$taille, family = binomial(logit))
+anova(m2, m1, test="Chisq")
+```
+
+```{r, eval=FALSE}
+library(aod)
+varEst = summary(m1)$cov.unscaled
+Est = summary(m1)$coefficient[,1]
+Est
+#wald test for age
+wald.test(Sigma = varEst, b = Est , Terms = c(1,3)
+```
+---
+
+##  V) Comment utiliser les tests de significativité?
+
+- Ces tests peuvent  être utilisés pour **comparer des modèles**, et décider s’il faut ou non inclure une variable dans notre modèle explicatif de Y.
+
+- Ils sont aussi utiles pour **tester une variable catégorielle** en testant conjointement toutes ses catégories 
+
+Rappels sur les tests
+
+![](fig/test.png)
+
+- Souvent dans les tests, on cherche à contrôler le risque de type 1, au niveau $\alpha$.
+
+Si on a p-valeur du test=4%, c’est que si $H_0$ est vrai, et qu’on répétait la simulation 100 fois, on aurait obtenu 4 fois une valeur de statistique de test égale ou plus extrême que celle observée.
+
+---
+
+
+## sexpred
+
+
+https://competitions.codalab.org/competitions/21853?secret_key=b50bf124-3513-4190-9397-ddd6c2561aea
+
+
+
+---
+
