@@ -21,7 +21,7 @@ https://competitions.codalab.org/competitions/21360?secret_key=1b0893b2-c695-4c9
 
 To participate, you need to:
 
-1- create an acount on the codalab platform
+1- create an account on the codalab platform
 
 2- subscribe to the *Survival challenge*
 
