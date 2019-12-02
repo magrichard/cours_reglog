@@ -13,36 +13,6 @@ knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.
 
 ---
 
-## Evaluation
-
- - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
- 
- - data challenge à la fin des séances "Régression Logistique" et "Survie" (23 janvier 2019)
-
-## Pré-requis
- 
- - R https://cran.r-project.org 
- - RStudio https://www.rstudio.com
-
-## Cours 
-
-- https://github.com/magrichard/cours_reglog
-
----
-
-## Données : data_nutri
-
-```{r}
-d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
-d$sex = as.factor(d$sex)
-DT::datatable(d, width = "100%")
-# head(d)
-s = as.numeric(d$sex) - 1
-
-```
-
-
----
 
 # Plan
 
@@ -94,9 +64,7 @@ On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
 
 ---
 
----
-
-## I) Rappel régression logistique :  intuition de la vraisemblance
+## I) Rappel régression logistique :  vraisemblance
 
 - **Définition** : Probabilité d’observer un évènement si le modèle envisagé est vrai
 
@@ -125,16 +93,16 @@ l(x_i, 0) &=& P(y_i = 1|x_i)^0 (1-P(y_i=1|x_i))^1 &=& \pi(x_i)^0(1-\pi(x_i))^1 \
 
 
 ```{r echo=FALSE, results="hide"}
-py1x = function(t,m) {
-  x = m$coefficients[[1]] + m$coefficients[[2]]*t
-  1/(1 + exp(-x))
-}
 d[c(2, 16),c("poids", "sex")]
 layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
 m = glm(s~d$poids, family = binomial(logit))
 m$coefficients
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
 logitinv = function(x) 1/(1 + exp(-x))
 x = min(d$poids):max(d$poids)
 lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=1, lwd=2)
@@ -153,6 +121,15 @@ arrows(d$poids[16], 0, d$poids[16], py1x(d$poids,m)[16], col=adjustcolor(2, alph
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
 legend("bottomright","1 - P(Y=yi|X=xi)", col=4, lty=1, cex=0.6)
+
+
+
+
+
+
+
+
+
 ```
 
 
