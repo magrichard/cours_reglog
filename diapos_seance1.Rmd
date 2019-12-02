@@ -211,43 +211,34 @@ $$P(Y=k)=p^k(1-p)^{1-k}, k \in \{0,1\}$$
 
 ---
 
-## III) Formalisme : 
-
-### Fonction logit
-
+## III) Formalisme : la fonction logit
 
 \begin{eqnarray}
               \text{logit: } ]0,1[ & \rightarrow & \mathbb{R} \\
                                  x & \rightarrow & logit(x)  =  log(\frac{x}{1-x}) \\ 
 \end{eqnarray}
-
 $$ \lim_{x\to0} logit(x) = -\infty $$
 $$ \lim_{x\to1} logit(x) = +\infty $$
+```{r echo=FALSE}
+x = 0:100/100
+layout(1, respect=TRUE)
+plot(x, log(x/(1-x)), main="logit")
+```
 
 La fonction *logit* s’inverse :
-
-
 \begin{eqnarray}
               \text{logit: } \mathbb{R}& \rightarrow &  ]0,1[  \\
                       y & \rightarrow & logit^{-1}(y) = \frac{1}{1+e^{-y}}  
 \end{eqnarray}
-
-
-
-
----
-
-## III) Exemple 4 : la fonction logit
-
-```{r}
-# logit: [0,1] -> R
-#            p -> log(p/1-p)
-# logit(p) = log(p/1-p)
-x = 0:100/100
-layout(matrix(1:6, 2, byrow=TRUE), respect=TRUE)
-plot(x, log(x/(1-x)), main="logit")
-plot(log(x/(1-x)), x, main="logit^-1")
+```{r echo=FALSE}
+x = seq(-4, 4,  length.out=100)
+layout(1, respect=TRUE)
+plot(x, 1 / (1+exp(-x)), main="logit^-1")
 ```
+
+
+
+
 
 
 
@@ -288,14 +279,14 @@ m$coefficients
 logitinv = function(x) 1/(1 + exp(-x))
 x = min(d$poids):max(d$poids)
 lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
-legend("bottomright", "logit(Y)=b.X", col=2, lty=1, cex=0.6)
+legend("bottomright", "Y=Pi(X)=logit^-1(b.X)", col=2, lty=1, cex=0.6)
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 py1x = function(t,m) {
   x = m$coefficients[[1]] + m$coefficients[[2]]*t
   1/(1 + exp(-x))
 }
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
-legend("bottomright","1 - P(Y|X)", col=4, lty=1, cex=0.6)
+legend("bottomright","1 - P(Y=y_i|X=x_i)", col=4, lty=1, cex=0.6)
 ```
 
 
@@ -315,6 +306,66 @@ legend("bottomright","1 - P(Y|X)", col=4, lty=1, cex=0.6)
 
 - Pour l’observation $i$, la contribution à la vraisemblance est donc:
 $$l(x_i, y_i) = P(y_i = 1|x_i)^{y_i} (1-P(y_i=1|x_i))^{1-y_i} = \pi(x_i)^{y_i}(1-\pi(x_i))^{1-y_i} $$
+
+
+
+---
+
+## IV) Estimation : intuition de la vraisemblance
+
+- Pour l’observation $i$, la contribution à la vraisemblance est donc:
+$$l(x_i, y_i) = P(y_i = 1|x_i)^{y_i} (1-P(y_i=1|x_i))^{1-y_i} = \pi(x_i)^{y_i}(1-\pi(x_i))^{1-y_i} $$
+
+
+
+si $y_i = 1$ : 
+\begin{eqnarray}
+l(x_i, 1) &=& P(y_i = 1|x_i)^1 (1-P(y_i=1|x_i))^0 &=& \pi(x_i)^1 (1-\pi(x_i))^0 \\
+&=& P(y_i = 1|x_i) 1 &=& \pi(x_i) 1 \\
+&=& P(y_i = 1|x_i) &=& \pi(x_i) \\
+\end{eqnarray}
+
+
+
+
+si $y_i = 0$ : 
+\begin{eqnarray}
+l(x_i, 0) &=& P(y_i = 1|x_i)^0 (1-P(y_i=1|x_i))^1 &=& \pi(x_i)^0(1-\pi(x_i))^1 \\
+&=& 1 (1-P(y_i=1|x_i)) &=& 1 (1-\pi(x_i)) \\ 
+&=& 1-P(y_i=1|x_i) &=& 1-\pi(x_i) \\ 
+\end{eqnarray}
+
+
+```{r echo=FALSE, results="hide"}
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
+d[c(2, 16),c("poids", "sex")]
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+m = glm(s~d$poids, family = binomial(logit))
+m$coefficients
+logitinv = function(x) 1/(1 + exp(-x))
+x = min(d$poids):max(d$poids)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=1, lwd=2)
+legend("bottomright", "Y=Pi(X)", col=1, lty=1, cex=0.6)
+legend("bottomright", c("Y=Pi(X)", "l(xi, yi)"), col=1:2, lty=1, cex=0.6)
+
+
+points(d$poids[2], s[2], col=2, pch=16)
+arrows(d$poids[2], 1, d$poids[2], py1x(d$poids,m)[2], col=adjustcolor(2, alpha.f=0.5), length=0.05, lwd=3)
+
+points(d$poids[16], s[16], col=2, pch=16)
+arrows(d$poids[16], 0, d$poids[16], py1x(d$poids,m)[16], col=adjustcolor(2, alpha.f=0.5), length=0.05, lwd=3)
+
+
+
+plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
+arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
+legend("bottomright","1 - P(Y=yi|X=xi)", col=4, lty=1, cex=0.6)
+```
 
 
 ---

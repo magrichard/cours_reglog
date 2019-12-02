@@ -53,7 +53,7 @@ III) Réduction de variables
 
 ---
 
-## I) Rappel régression logistique : 
+## I) Rappel régression logistique : notation et modèle
 
 ### Principe
 
@@ -62,6 +62,8 @@ $$Y \sim X$$
 $$E(Y|X) \sim X$$
 
 Par exemple, on cherche à connaitre la probabilité qu’un individu soit un homme sachant sa taille, son poids, ses habitudes alimentaires.
+
+
 
 ### La fonction *logit*
 
@@ -92,15 +94,42 @@ On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
 
 ---
 
-## I) Rappel regression logistique : 
-### Exemple sex ~ poids
+---
+
+## I) Rappel régression logistique :  intuition de la vraisemblance
+
+- **Définition** : Probabilité d’observer un évènement si le modèle envisagé est vrai
+
+- Le modèle conditionnel de $Y$ sachant $X$ est : $E(Y|X = x) \sim B(\pi(x))$
+
+- Pour l’observation $i$, la contribution à la vraisemblance est donc:
+$$l(x_i, y_i) = P(y_i = 1|x_i)^{y_i} (1-P(y_i=1|x_i))^{1-y_i} = \pi(x_i)^{y_i}(1-\pi(x_i))^{1-y_i} $$
 
 
-```{r}
-d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
-d$sex = as.factor(d$sex)
-DT::datatable(d, width = "100%")
-s = as.numeric(d$sex) - 1
+si $y_i = 1$ : 
+\begin{eqnarray}
+l(x_i, 1) &=& P(y_i = 1|x_i)^1 (1-P(y_i=1|x_i))^0 &=& \pi(x_i)^1 (1-\pi(x_i))^0 \\
+&=& P(y_i = 1|x_i) 1 &=& \pi(x_i) 1 \\
+&=& P(y_i = 1|x_i) &=& \pi(x_i) \\
+\end{eqnarray}
+
+
+
+
+si $y_i = 0$ : 
+\begin{eqnarray}
+l(x_i, 0) &=& P(y_i = 1|x_i)^0 (1-P(y_i=1|x_i))^1 &=& \pi(x_i)^0(1-\pi(x_i))^1 \\
+&=& 1 (1-P(y_i=1|x_i)) &=& 1 (1-\pi(x_i)) \\ 
+&=& 1-P(y_i=1|x_i) &=& 1-\pi(x_i) \\ 
+\end{eqnarray}
+
+
+```{r echo=FALSE, results="hide"}
+py1x = function(t,m) {
+  x = m$coefficients[[1]] + m$coefficients[[2]]*t
+  1/(1 + exp(-x))
+}
+d[c(2, 16),c("poids", "sex")]
 layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
@@ -108,16 +137,24 @@ m = glm(s~d$poids, family = binomial(logit))
 m$coefficients
 logitinv = function(x) 1/(1 + exp(-x))
 x = min(d$poids):max(d$poids)
-lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=2, lwd=2)
-legend("bottomright", "Y = Pi(X) = logit^-1(b.X)", col=2, lty=1, cex=0.6)
+lines(x, logitinv(m$coefficients[[1]] + m$coefficients[[2]]*x), col=1, lwd=2)
+legend("bottomright", "Y=Pi(X)", col=1, lty=1, cex=0.6)
+legend("bottomright", c("Y=Pi(X)", "l(xi, yi)"), col=1:2, lty=1, cex=0.6)
+
+
+points(d$poids[2], s[2], col=2, pch=16)
+arrows(d$poids[2], 1, d$poids[2], py1x(d$poids,m)[2], col=adjustcolor(2, alpha.f=0.5), length=0.05, lwd=3)
+
+points(d$poids[16], s[16], col=2, pch=16)
+arrows(d$poids[16], 0, d$poids[16], py1x(d$poids,m)[16], col=adjustcolor(2, alpha.f=0.5), length=0.05, lwd=3)
+
+
+
 plot(d$poids, s, main="sex~poids", xlab="poids", ylab="sex")
-py1x = function(poids,m) {
-  x = m$coefficients[[1]] + m$coefficients[[2]]*poids
-  logitinv(x)
-}
 arrows(d$poids, s, d$poids, py1x(d$poids,m), col=adjustcolor(4, alpha.f=0.2), length=0.05, lwd=3)
-legend("bottomright","1 - P(Y|X)", col=4, lty=1, cex=0.6)
+legend("bottomright","1 - P(Y=yi|X=xi)", col=4, lty=1, cex=0.6)
 ```
+
 
 ---
 

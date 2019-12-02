@@ -41,7 +41,7 @@ Regression logiostique univarié pour chaque gène
 
 ```{r}
 # defining sex as 0 or 1 
-s = as.numeric(d$sex == "M")
+s = as.numeric(d$histology == "TCGA-LUAD")
 s
 
 # get gene names
