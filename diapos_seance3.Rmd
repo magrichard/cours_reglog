@@ -128,6 +128,97 @@ legend("bottomright","1 - P(Y=yi|X=xi)", col=4, lty=1, cex=0.6)
 
 
 
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$poids, s, main="sex~poids, coef[1] step by 1", xlab="poids", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+x = min(d$poids):max(d$poids)
+m = glm(s~d$poids, family = binomial(logit))
+m$coefficients
+coefs = m$coefficients
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2)
+coefs[1] = coefs[1] - 5 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[1] = coefs[1] + 1
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+
+
+plot(d$poids, s, main="sex~poids, coef[2] step by 0.01", xlab="poids", ylab="sex")
+# P(Y=1|X) = logitinv(a + b.x)
+x = min(d$poids):max(d$poids)
+m = glm(s~d$poids, family = binomial(logit))
+m$coefficients
+coefs = m$coefficients
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2)
+coefs[2] = coefs[2] - 0.1 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
+coefs[2] = coefs[2] + 0.01 
+lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
 
 
 ```

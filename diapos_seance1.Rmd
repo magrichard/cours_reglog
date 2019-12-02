@@ -409,7 +409,6 @@ coefs[1] = coefs[1] + 1
 lines(x, logitinv(coefs[[1]] + coefs[[2]]*x), col=1, lwd=2, lty=2)
 
 
-layout(matrix(1:2, 1), respect=TRUE)
 plot(d$poids, s, main="sex~poids, coef[2] step by 0.01", xlab="poids", ylab="sex")
 # P(Y=1|X) = logitinv(a + b.x)
 x = min(d$poids):max(d$poids)
