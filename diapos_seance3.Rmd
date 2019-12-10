@@ -91,6 +91,14 @@ l(x_i, 0) &=& P(y_i = 1|x_i)^0 (1-P(y_i=1|x_i))^1 &=& \pi(x_i)^0(1-\pi(x_i))^1 \
 &=& 1-P(y_i=1|x_i) &=& 1-\pi(x_i) \\ 
 \end{eqnarray}
 
+```{r}
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
+s = as.numeric(d$sex) - 1
+#DT::datatable(d, width = "100%")
+# head(d)
+```
+
 
 ```{r echo=FALSE, results="hide"}
 d[c(2, 16),c("poids", "sex")]

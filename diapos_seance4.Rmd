@@ -11,36 +11,22 @@ options(htmltools.dir.version = FALSE, width = 75)
 knitr::opts_chunk$set(echo = TRUE, fig.align='center', dev='png', dpi = 95, out.width = "100%")
 ```
 
----
-
-## Evaluation
-
- - individuelle sur un jeu de données aprés 2 séances de "Régression Logistique"
- 
- - data challenge à la fin des séances "Régression Logistique" et "Survie" (23 janvier 2019)
-
-## Pré-requis
- 
- - R https://cran.r-project.org 
- - RStudio https://www.rstudio.com
-
-## Cours 
-
-- https://github.com/magrichard/cours_reglog
 
 ---
 
 # Plan
 
-I) Rappel : Modèle, OR, RR et test de significativité
+
+Rappel : Modèle, OR, RR et test de significativité
+
+I) Adequation du modèle aux données
 II) Interprétation (et dangers!)
 III) Prédiction (et dangers!)
 IV) Introduction à la regression polytomique
 
-
 ---
 
-## I) Rappel régression logistique : 
+## Rappel régression logistique : notation et modèle
 
 ### Principe
 
@@ -50,6 +36,15 @@ $$E(Y|X) \sim X$$
 
 Par exemple, on cherche à connaitre la probabilité qu’un individu soit un homme sachant sa taille, son poids, ses habitudes alimentaires.
 
+
+ - On pose Y la variable binaire,
+ - X le vecteur des covariables/variables explicatives (qualitatives ou quantitatives)
+ - On veut modéliser $E(Y|X) = f(X)$ avec $E(Y|X) = P(Y=1|X)$ noté $\pi (X)$
+
+---
+
+## Rappel régression logistique : notation et modèle
+
 ### La fonction *logit*
 
 
@@ -58,6 +53,7 @@ Par exemple, on cherche à connaitre la probabilité qu’un individu soit un ho
                                  x & \rightarrow & logit(x)  =  log(\frac{x}{1-x}) \\ 
 logit^{-1}(y) = \frac{1}{1+e^{-y}} & \rightarrow & y
 \end{eqnarray}
+
 
 
 ### La régression logistique
@@ -74,9 +70,17 @@ Comme en régression linéaire, l’objet de cette modélisation est *d’estime
 
 On obtient ainsi $\pi(X)$, le prédicteur de Y en fonction de X.
 
+```{r}
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+d$sex = as.factor(d$sex)
+s = as.numeric(d$sex) - 1
+#DT::datatable(d, width = "100%")
+# head(d)
+```
+
 ---
 
-##  I) Rappel regression logistique :
+##  Rappel regression logistique :
 
  
 ### Les mesures d'interêt
@@ -112,7 +116,7 @@ Ils donnent la même indication sur la relation entre $Y$ et $X$ :
 
 ---
 
-##  I) Rappel regression logistique :
+##  Rappel regression logistique :
 
 ### La significativité du paramêtre $\beta_k$
 
@@ -138,11 +142,10 @@ On veut tester si l’ajout de paramètres est pertinent.
  
 Test du rapport de vraisemblance : $T = -2(log(L_1) - log(L_2)) \sim \mathcal{X}^2_p$
 
+
 ---
 
-##  I) Rappel regression logistique :
-
-### Adéquation du modèle
+## I) Adéquation du modèle
 
 Comment mesurer si le modèle construit **prédit de façon efficace** les données observées ?
 
@@ -154,34 +157,274 @@ Mesurer l’**adéquation** du modèle **aux données** c’est étudier essenti
 
 -- Pouvoir discriminant du modèle :  courbe **ROC** et critère **AUC** (Area Under Curve)
 
-### Sélection de variables
 
-- Critères de choix
+- La *contribution* de chaque observation au modèle (détection des outliers)
 
-  -- Critère du $R^2$ 
-  
-  -- Critètre d’information d’Akaike (AIC)
-  
-  -- Critètre d’information bayesien (BIC)
+-- Résidus de Pearson 
 
-- Procédure de sélection de variable
+-- Résidus de déviance
 
--- Forward (ou pas à pas ascendante)
 
--- Backward (ou pas à pas descendante)
-
--- Stepwise
 
 ---
 
-# Plan
+## I)  Adéquation du modèle : Test de Howmer-Lemeshow
 
-I) Rappel : Modèle, OR, RR et test de significativité
-II) Interprétation (et dangers!)
-III) Prédiction (et dangers!)
-IV) Introduction à la regression polytomique
+### Principe
+
+- Pour chaque observation $i$, on calcule la probabilité prédite $\widehat{P}(Y=1|x_i) = \widehat{\pi}(x_i)$.
+
+- On regroupe les observations par quantiles de distribution de la valeur prédite (*i.e.* par valeurs croissantes en $K$ groupes $G_k$  de taille égale; on prend souvent $K=10$).
+
+- Pour chaque groupe d’observations $G_k$ , on compare le nombre de sujets pour lesquels $Y=1$ ($n_{1k}$), au nombre de sujets malades prédits par le modèle ($\widehat{n}_{1k}$)
+
+$$n_{1k} = \sum_{i\in{G_k}}y_i \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}\widehat{\pi}(x_i)$$
 
 
+- De même on calcule $n_{0k}$ et $\widehat{n}_{0k}$
+
+$$n_{0k} = \sum_{i\in{G_k}} (1-y_i) \ \ \ \ \ \ \ \ \ vs. \ \ \ \ \ \ \ \ \ \ \widehat{n}_{1k} = \sum_{i\in{G_k}}(1-\widehat{\pi}(x_i))$$
+
+- On compare ces valeurs observées $n_jk$ aux valeurs prédites  $\widehat{n}_jk$     (on voudrait idéalement qu’elles soient égales) par un test de $\mathcal{X}^2_{K-2}$ à $K-2$ degrés de libertés
+
+Rq: il faut que pour tout $k$, $n_jk >5$ et $\widehat{n}_jk >5$ pour pouvoir appliquer ce test.
+
+---
+
+## I)  Adéquation du modèle : Test de Howmer-Lemeshow
+
+### Exemple
+
+$$H_0 : {\widehat{n}_{1k} = n_{1k}}, \forall j,k$$	
+$$H_1 : \exists (j,k), \widehat{n}_{1k} \neq n_{1k} $$
+On définit le modèle
+
+```{r}
+m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+```
+
+Puis la probabilité prédite pour chaque observation
+
+```{r}
+prob_pred <- m$fitted.values
+pred <- predict.glm(object = m, 
+                    newdata = data.frame(d$poids,d$taille,d$age),
+                    type = "response")
+sum(pred == m$fitted.values)
+hist(prob_pred,breaks=10)
+```
+
+On réalise le test
+
+```{r}
+test = ResourceSelection::hoslem.test (s, prob_pred)
+```
+
+La p-valeur du test de Hosmer-Lemeslow est > 0.05, on consreve $H_0$ et les valeurs prédites et observées concordent bien, le modèle est bon. 
+
+Définition des groupes par quantiles de probabilités prédites $\widehat{\pi}(x_i)$
+
+*Cutyhat*: Définition des groupes par quantiles de probabilités prédites $\widehat{\pi}(x_i)$
+
+*y0 et y1*: $n_{jk}$ le nombre **observé** de sujets $Y=0$ et $Y=1$ par groupe
+
+
+```{r}
+c(quantile(prob_pred, 0.1),   
+  quantile(prob_pred, 0.2),
+  quantile(prob_pred, 0.3),
+  quantile(prob_pred, 0.4),   
+  quantile(prob_pred, 0.5),
+  quantile(prob_pred, 0.6),
+  quantile(prob_pred, 0.7),   
+  quantile(prob_pred, 0.8),
+  quantile(prob_pred, 0.9)
+  )
+#pour le premier quantile
+idx= which(prob_pred < quantile(prob_pred, 0.1))
+sum(s[idx])
+sum(1-s[idx])
+test$observed
+
+```
+
+*yhat0 et yhat1*: $n_{jk}$ le nombre **estimé** de sujets $Y=0$ et $Y=1$ par groupe
+
+Le nombre estimé d'événements n'est que la somme des probabilités prédites sur les individus du groupe
+
+```{r}
+#pour le premier quantile
+idx= which(prob_pred < quantile(prob_pred, 0.1))
+sum(prob_pred[idx])
+sum(1-prob_pred[idx])
+test$expected
+
+```
+
+
+
+---
+
+## I)  Adéquation du modèle : courbe ROC
+
+### Principe
+
+Le **pouvoir discriminant** correspond à la capacité du modèle à correctement classer les observations.
+
+- Pour chaque observation $i$, on calcule la probabilité prédite $\widehat{P}(Y=1|x_i) = \widehat{\pi}(x_i)$.
+
+- On définit pour un seuil $s \in [0,1]$ choisi :
+$$ \widehat{Y}_i = \Bigg\{
+\begin{align}
+1 && \text{si} && \widehat{\pi}(x_i) \geq s \\ 
+0 && \text{sinon}
+\end{align}
+$$
+
+- La **proportion de bien classés** correspond à :
+$$ \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\} + \# \{\widehat{Y}_i = 0, Y_i = 0\}}{n} $$
+
+
+
+
+- La **Sensibilité** correspond à la proportion de bien classées parmi les observations pour lesquelles $Y=1$, $$ sensibilité = \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\}}{\# \{Y_i = 1\}} $$
+
+
+- La **Spécificité** correspond à la proportion de bien classées parmi les oservations pour lesquelles $Y=0$, $$spécificité =  \frac{\# \{\widehat{Y}_i = 0, Y_i = 0\}}{\# \{Y_i = 0\}} $$
+
+- On cherche à **maximiser sensibilité et spécificité** en faisant varier $s \in [0,1]$
+
+---
+
+## I)  Adéquation du modèle : courbe ROC
+
+### Exemple
+
+
+On recherche le seuil $s$ optimum (souvent le plus proche de $sensibilité=1$ et $spécificité=1$)
+
+```{r}
+m = glm(s~d$poids+d$taille+d$age, family = binomial(logit))
+ROC = pROC::roc(response=s, m$fitted.values)
+plot(ROC, xlim=c(1,0))
+```
+
+On recherche le seuil pour lequel on maximise la sensibilité et la spécificité).
+
+
+```{r}
+plot(ROC, xlim=c(1,0))
+test = (1-ROC$sensitivities)^2+(1-ROC$specificities)^2
+wh = which(test==min(test))
+ROC$thresholds[wh]
+points(ROC$sensitivities[wh], ROC$sensitivities[wh], col = 2, cex = 2, lwd = 2)
+```
+
+--- 
+
+## I)  Adéquation du modèle : AUC
+
+### Principe
+
+AUC signifie "aire sous la courbe ROC". 
+
+AUC           | Discrimination
+------------- | -------------
+0.5           | Nulle
+0.7 - 0.8     | Acceptable
+0.8 - 0.9     | Excellente
+> 0.9         | Exceptionnelle
+
+Plus l’aire sous la courbe augmente, plus le modèle est capable de bien classer les observations:
+
+- Si $AUC = 0.5$ alors le modèle classe de manière complètement aléatoire les observations
+
+- Si $AUC > 0.9$ le modèle est très bon, voire trop bon, il faut évaluer s’il y a overfitting
+ 
+--- 
+
+## I)  Adéquation du modèle : AUC
+
+## Exemple
+
+```{r}
+m1 = glm(s~d$poids, family = binomial(logit))
+m2 = glm(s~d$taille, family = binomial(logit))
+m3 = glm(s~d$taille+d$poids, family = binomial(logit))
+pROC::roc(response=s, m1$fitted.values)
+ROC1 = pROC::roc(response=s, m1$fitted.values)
+pROC::roc(response=s, m2$fitted.values)
+ROC2 = pROC::roc(response=s, m2$fitted.values)
+pROC::roc(response=s, m3$fitted.values)
+ROC3 = pROC::roc(response=s, m3$fitted.values)
+plot(ROC1, xlim=c(1,0), col=2)
+lines(ROC2, xlim=c(1,0), col=4)
+lines(ROC3, xlim=c(1,0), col="grey")
+legend("bottomright", lty=1, c("s~poids", "s~taille", "s~taille+poids"), col=c("2", "4", "grey"))
+```
+
+
+---
+
+
+
+## I)  Adéquation du modèle : les résidus
+
+
+Résidus de Pearson :
+
+$$ r_{p_i} = \frac{Y_i - \widehat{\pi}_i}{\sqrt{\widehat{\pi}_i(1-\widehat{\pi}_i)}} $$
+
+Résidus de déviance : 
+
+
+$$r_{D_i} = \left  \lbrace
+\begin{array}{l}
+\sqrt(2|log(\widehat{\pi}_i)|)      \ \ \ \  \text{si}\  Y_i=1  \\
+ - \sqrt(2|log(1-\widehat{\pi}_i)|) \ \ \ \  \text{si}\  Y_i=0
+\end{array}
+\right.$$
+
+Sujet i mal modélisé si $|r_{p_i}|$ ou  $|r_{D_i}| > 2$ 
+
+On estime alors le modèle après exclusion de ces individus pour étudier la robustesse du modèle
+
+
+Une valeur extrême peut être:
+
+- exacte et il convient alors de ne pas modifier dans la base de données. 
+- une valeur aberrante, c’est-à-dire qui est fausse et qui ne passe pas inaperçu.
+
+Une grande valeur de résidu peut indiquer des données individuelles aberrantes 
+mais des données individuelles peuvent être aberrantes sans que le résidu soit important. 
+
+```{r}
+plot(residuals(m, type="deviance") , xlab="",ylab="Deviance residuals")
+plot(residuals(m, type="pearson") , xlab="",ylab="Pearson residuals")
+idx = which(residuals(m, type="pearson")>2)
+d[idx,]
+```
+
+```{r}
+d$s =s 
+m_all  = glm(s~d$taille+d$poids, family = binomial(logit))
+m_cor = glm(s~ taille+poids, 
+            data = d[-idx, ],
+            family = binomial(logit))
+ROC1 = pROC::roc(response=s, m_all$fitted.values)
+pROC::roc(response=s, m_all$fitted.values)
+pred <- predict.glm(object = m_cor, newdata = d, type = "response")
+ROC2 = pROC::roc(response=s, pred)
+pROC::roc(response=s, pred)
+pred <- predict.glm(object = m_cor, newdata = d[-idx, ], type = "response")
+ROC3 = pROC::roc(response=s[-idx], pred)
+pROC::roc(response=s[-idx], pred)
+plot(ROC1, xlim=c(1,0), col=2)
+lines(ROC2, xlim=c(1,0), col=4)
+lines(ROC3, xlim=c(1,0), col="grey")
+legend("bottomright", lty=1, c("all", "corr on all", "corr on corr"), col=c("2", "4", "grey"))
+
+```
 
 ---
 
