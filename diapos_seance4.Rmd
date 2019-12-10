@@ -85,7 +85,7 @@ s = as.numeric(d$sex) - 1
  
 ### Les mesures d'interêt
 
-Comment interpréter $\widehat{\beta_k}$ ?  Quel est l‘effet de la variable $X_k$ sur $logit(P(Y=1|X))$ ?
+Quel est l‘effet de la variable $X_k$ sur $logit(P(Y=1|X))$ ?
 
 
 - *Définition*  **odds** 
@@ -120,7 +120,7 @@ Ils donnent la même indication sur la relation entre $Y$ et $X$ :
 
 ### La significativité du paramêtre $\beta_k$
 
-On veut tester l’influence du facteur $X_k$. 
+On veut tester l’influence du facteur $X_k$. Comment interpréter $\widehat{\beta_k}$ ?
 
 $$\left\lbrace
 \begin{array}{l}
@@ -285,12 +285,12 @@ $$
 $$ \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\} + \# \{\widehat{Y}_i = 0, Y_i = 0\}}{n} $$
 
 
+![](fig/350px-Sensitivity_and_specificity.svg.png)
+
+- La **Sensibilité** (or True Positive Rate, TPR) correspond à la proportion de bien classées parmi les observations pour lesquelles $Y=1$, $$ sensibilité = \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\}}{\# \{Y_i = 1\}} =  \frac{TP}{P} =  \frac{TP}{TP + FN}$$
 
 
-- La **Sensibilité** correspond à la proportion de bien classées parmi les observations pour lesquelles $Y=1$, $$ sensibilité = \frac{\# \{\widehat{Y}_i = 1, Y_i = 1\}}{\# \{Y_i = 1\}} $$
-
-
-- La **Spécificité** correspond à la proportion de bien classées parmi les oservations pour lesquelles $Y=0$, $$spécificité =  \frac{\# \{\widehat{Y}_i = 0, Y_i = 0\}}{\# \{Y_i = 0\}} $$
+- La **Spécificité** (or True Negative Rate, TNR)correspond à la proportion de bien classées parmi les oservations pour lesquelles $Y=0$, $$spécificité =  \frac{\# \{\widehat{Y}_i = 0, Y_i = 0\}}{\# \{Y_i = 0\}} =  \frac{TN}{N} =  \frac{TN}{TN + FP}$$
 
 - On cherche à **maximiser sensibilité et spécificité** en faisant varier $s \in [0,1]$
 
@@ -317,7 +317,9 @@ plot(ROC, xlim=c(1,0))
 test = (1-ROC$sensitivities)^2+(1-ROC$specificities)^2
 wh = which(test==min(test))
 ROC$thresholds[wh]
-points(ROC$sensitivities[wh], ROC$sensitivities[wh], col = 2, cex = 2, lwd = 2)
+ROC$specificities[wh] # True Negative Rate
+ROC$sensitivities[wh] # True Positive Rate
+points(ROC$specificities[wh], ROC$sensitivities[wh], col = 2, cex = 2, lwd = 2)
 ```
 
 --- 
@@ -638,7 +640,7 @@ $$logit(\pi(X)) = logit(\widehat P(Y_1 = 0 | X = x_i)) = \widehat \beta x_i$$
 - La probabilité estimée d’évènement $Y=1$ est:
 
 $$\pi(X) = logit^{-1}(\beta X)$$
-$$\widehat P(Y_1 = 0 | X = x_i)  = logit^{-1}(\beta X) = \frac{e^{\widehat\beta x_i}}{1 + e^{\widehat\beta x_i}} $$
+$$\widehat P(Y_1 = 1 | X = x_i)  = logit^{-1}(\beta X) = \frac{e^{\widehat\beta x_i}}{1 + e^{\widehat\beta x_i}} $$
 
 ---
 
